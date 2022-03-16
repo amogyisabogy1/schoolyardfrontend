@@ -33,12 +33,7 @@ function Register({route}) {
   const [password, setPassword] = React.useState('');
 
   const [{signUp}, state] = React.useContext(AuthContext);
-  console.log(state.username)
-  console.log(state.username)
-  console.log(state.username)
 
-
- 
   return (
     <View>
       <TextInput
@@ -88,53 +83,27 @@ async function save(key, value) {
 
 }
 
-let updateToken = async ()=> {
 
-  async function RefreshtokenMoment(){
-        
-    return fetch("http:/192.168.86.108/token/refresh",{
-      method:"POST",
-      headers:{ 
-        'Content-Type':"application/json"
-      },
-      body: JSON.stringify({'refresh':state.userToken.refreshtoken})
-      
-    }).then(response => response.json());
-  }
-  const usertokens123 = await RefreshtokenMoment();
-
-}
 
 export default function App({ navigation }) {
   
-  async function SetUserData(token){
-    
-    const token1 = token
-    async function UserDataget(token12){ 
-      console.log(token12)
-      console.log(token12)
-      console.log(token12)
-      console.log(token12)
-      console.log(token12)
-      console.log(token12)
+  const [loading,setLoading] = React.useState(true);
+  
+  
+  async function SetUserData(){
+
+    async function UserDataget(){ 
       return fetch("http:/192.168.86.108/getinfofromtoken/",{
         method:"GET",
         headers:{  
-          'Authorization': token12.accesstoken,
+          'Authorization': state.access,
         },
         //body: JSON.stringify({'token':data.token})
         
       }).then(response => response.json());
       
     }
-    const userData12 = await UserDataget(token1);
-    console.log(userData12)
-    console.log(userData12)
-    console.log(userData12)
-    
-    
-    
-  
+    const userData12 = await UserDataget(); 
     dispatch({ type: 'SET_USER_DATA', username: userData12.username, school: userData12.school });
   }
   const [state, dispatch] = React.useReducer(
@@ -143,14 +112,16 @@ export default function App({ navigation }) {
         case 'RESTORE_TOKEN':
           return {
             ...prevState,
-            userToken: action.token,
+            accesstoken: action.accesstoken,
+            refreshtoken: action.refreshtoken,
             isLoading: false,
-          };
+          }; 
         case 'SIGN_IN':
           return {
             ...prevState,
             isSignout: false,
-            userToken: action.token,
+            refreshtoken: action.refreshtoken,
+            accesstoken: action.accesstoken
           };
         case 'SIGN_OUT':
           return {
@@ -169,7 +140,8 @@ export default function App({ navigation }) {
     {
       isLoading: true,
       isSignout: false,
-      userToken: null,
+      refreshtoken: null,
+      accesstoken: null,
       username: "HELLO",
       school: "fairfieldwarde",
     }
@@ -193,25 +165,25 @@ export default function App({ navigation }) {
      
       // This will switch to the App screen or Auth screen and this loading
       // screen will be unmounted and thrown away.
-      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+      if (userToken != null){
+        dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+      }
+      
     };
 
     bootstrapAsync();
   }, []);
 
   
+  
   React.useEffect(() => {
 
-    // Fetch the token from storage then navigate to our appropriate place
-  
-    token = state.userToken
+    // Fetch the token from storage then navigate to our appropriate plac
 
-    if (token != null){
-     SetUserData(token);
+    if (state.accesstoken != null){
+     console.log("setuserdata")
     }
-  }, [state.userToken]);
-
-
+  }, [state.accesstoken]);
 
   const authContext = React.useMemo(
     () => ({
@@ -233,9 +205,11 @@ export default function App({ navigation }) {
         }
         const usertokens123 = await Signinlol1();
 
-        save("refreshtoken", usertokens123.refreshtoken)
-        save("usertoken", usertokens123.accesstoken)
-        dispatch({ type: 'SIGN_IN', token: usertokens123 });
+        save("refreshtoken", usertokens123.refresh)
+        save("usertoken", usertokens123.access)
+        dispatch({ type: 'SIGN_IN', refreshtoken: usertokens123.refresh, accesstoken: usertokens123.access });
+        
+
       },
       signOut: () => dispatch({ type: 'SIGN_OUT' }),
       signUp: async (data) => {
@@ -251,22 +225,63 @@ export default function App({ navigation }) {
         }).then(response => response.json());
       }
       const usertokens12 = await Signuplol();
-
+      console.log(usertokens12)
       save("refreshtoken", usertokens12.refreshtoken)
       save("usertoken", usertokens12.accesstoken)
+      console.log(usertokens12.accesstoken)
         
-      dispatch({ type: 'SIGN_IN', token: usertokens12.accesstoken });
+      dispatch({ type: 'SIGN_IN', refreshtoken: usertokens12.refreshtoken, accesstoken:usertokens12.accesstoken });
+      
       },
     }),
     []
   );
+
+
+  React.useEffect(()=>{
+    if(loading){
+      updateToken()
+     }
+
+    let interval = setInterval(() => {
+      if(state.refreshtoken){
+        updateToken()
+        
+      }
+    }, 240000)
+    return ()=> clearInterval(interval)
+  },[state.refreshtoken,loading])
+
+
+  let updateToken = async ()=> {
+    
+    let response = await fetch('http://192.168.86.108/token/refresh/', {
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:JSON.stringify({'refresh': state.refreshtoken})
+    })
+
+    let data = await response.json()
+    if (response.status === 200){
+     console.log(data)
+     console.log("await is here")
+     dispatch({ type: 'RESTORE_TOKEN', accesstoken: data.access, refreshtoken: data.refresh });
+    }else {
+      console.log(data)
+    }
+    if(loading){
+      setLoading(false)
+  }
+}
 
   return (
     <AuthContext.Provider value={[authContext,state]}>
     <NavigationContainer>
       <Stack.Navigator>
       
-         {state.userToken == null ? (
+         {state.accesstoken == null ? (
           // No token found, user isn't signed in
           <React.Fragment>
           
