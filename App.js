@@ -34,10 +34,7 @@ function Register({route}) {
   const [password, setPassword] = React.useState('');
 
   const [{signUp}, state] = React.useContext(AuthContext);
-  console.log(email)
-  console.log(email)
-  console.log(school)
-  console.log(school)
+
 
   return (
     <View>
@@ -95,23 +92,18 @@ export default function App({ navigation }) {
   const [loading,setLoading] = React.useState(true);
   
   
-  async function SetUserData(){
+  async function Verify(){    
+    const res = await fetch("http:/192.168.86.108/getinfofromtoken/",{
+      method:"GET",
+      headers:{  
+        'Authorization': state.accesstoken,
+      },        
+    }).then(response => response.json());
 
-    async function UserDataget(){ 
-      return fetch("http:/192.168.86.108/getinfofromtoken/",{
-        method:"GET",
-        headers:{  
-          'Authorization': state.accesstoken,
-        },
-        //body: JSON.stringify({'token':data.token})
-        
-      }).then(response => response.json());
-      
-    }
-    const userData12 = await UserDataget(); 
-    console.log(userData12)
-    dispatch({ type: 'SET_USER_DATA', username: userData12.username, school: userData12.school });
-  }
+ console.log(res)
+ dispatch({ type: 'SET_USER_DATA', school: res.school, username: res.username });
+} 
+
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -148,7 +140,7 @@ export default function App({ navigation }) {
       isSignout: false,
       refreshtoken: null,
       accesstoken: null,
-      username: "HELLO",
+      username: null,
       school: null,
     }
   );
@@ -187,7 +179,7 @@ export default function App({ navigation }) {
     // Fetch the token from storage then navigate to our appropriate plac
 
     if (state.accesstoken != null){
-     SetUserData()
+     Verify()
     }
   }, [state.accesstoken]);
 
@@ -231,10 +223,8 @@ export default function App({ navigation }) {
         }).then(response => response.json());
       }
       const usertokens12 = await Signuplol();
-      console.log(usertokens12)
       save("refreshtoken", usertokens12.refreshtoken)
       save("usertoken", usertokens12.accesstoken)
-      console.log(usertokens12.accesstoken)
         
       dispatch({ type: 'SIGN_IN', refreshtoken: usertokens12.refreshtoken, accesstoken:usertokens12.accesstoken });
       
@@ -271,8 +261,7 @@ export default function App({ navigation }) {
 
     let data = await response.json()
     if (response.status === 200){
-     console.log(data)
-     console.log("await is here")
+     
      dispatch({ type: 'RESTORE_TOKEN', accesstoken: data.access, refreshtoken: data.refresh });
     }else {
       console.log(data)

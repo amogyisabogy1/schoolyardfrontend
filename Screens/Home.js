@@ -11,8 +11,10 @@ import  {AuthContext}  from '../App'
 
 
  
-function home(props) {
+function Home(props) {
     const [{signUp}, state] = React.useContext(AuthContext);
+    console.log(state.username)
+    console.log(state.school)
     
     const [data,setData] = useState("")
     const [loading,setLoading] = useState(true)
@@ -91,4 +93,4 @@ const styles = StyleSheet.create({
         backgroundColor:"blue"
     }
   });
-export default home
+export default Home

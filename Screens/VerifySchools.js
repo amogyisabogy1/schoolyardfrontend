@@ -40,7 +40,7 @@ export default function App() {
     }).then(response => response.json());
   }
   const schoolverified = await VerifySchool1(email);
-  console.log(schoolverified)
+
   setSchool(schoolverified)
   navigateSchool(schoolverified, email)
 } 
@@ -65,9 +65,9 @@ function navigateSchool(schools, email1){
     })
 
     userInfoResponse.json().then(data => {
-      console.log(data)
+  
       setUserInfo(data)
-      console.log(data.email)
+     
       Verify(data.email)
     })
 
