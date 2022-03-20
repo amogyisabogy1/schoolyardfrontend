@@ -10,13 +10,13 @@ function New(props) {
 
     
  const insertData = () =>{
-    fetch("http:/192.168.86.87/snippets/",{
+    fetch("http:/192.168.86.108/newpost/",{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",
-            'Authorization': 'Bearer ' + state.userToken,
+            'Authorization': state.accesstoken,
         }, 
-        body: JSON.stringify({title:title, username:state.username})
+        body: JSON.stringify({title:title, username:state.username, school:state.school})
     })
     .then(resp => resp.json())
     .then(data =>{

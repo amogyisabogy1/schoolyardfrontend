@@ -9,6 +9,7 @@ import  {AuthContext}  from '../App'
 
 
 
+
  
 function home(props) {
     const [{signUp}, state] = React.useContext(AuthContext);
@@ -18,7 +19,8 @@ function home(props) {
   
     const loadData = () => {
         fetch("http:/192.168.86.108/snippets/",{
-            method:"GET"
+            method:"GET",
+            
         })
         .then(resp => resp.json())
         .then(data =>{
@@ -33,7 +35,10 @@ function home(props) {
     }
     useEffect(()=>{
         fetch("http:/192.168.86.108/snippets/",{
-            method:"GET"
+            method:"GET",
+            headers:{  
+                'Authorization': state.accesstoken,
+              },
         })
         .then(resp => resp.json())
         .then(data =>{

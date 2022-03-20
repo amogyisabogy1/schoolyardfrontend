@@ -9,7 +9,7 @@ function Postdetail(props) {
     const [comment, changeComment] = React.useState([{text:"Comment"}]);
 
     useEffect(()=>{
-      fetch(`http:/192.168.86.87/comment/${data.id}/`,{
+      fetch(`http:/192.168.86.108/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -21,7 +21,7 @@ function Postdetail(props) {
     },[])
   
     const deletedData = (data) => {
-      fetch(`http:/192.168.86.87/snippets/${data.id}/`,{
+      fetch(`http:/192.168.86.108/snippets/${data.id}/`,{
         method:"DELETE",
         headers: { 
           "Content-type":"application/json"
@@ -35,7 +35,7 @@ function Postdetail(props) {
     
     }
     const addComment = () =>{
-      fetch("http:/192.168.86.87/comment/",{
+      fetch("http:/192.168.86.108/comment/",{
           method:"POST",
           headers : {   
               "Content-Type":"application/json"
@@ -58,7 +58,9 @@ function Postdetail(props) {
    <View>
     <View style = {styles.detailStyle}>
        <Card>
+        <Text>{data.username}</Text>
         <Text style = {{fontSize:25}}>
+          
           {data.title}
         </Text>
        </Card>

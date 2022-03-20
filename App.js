@@ -29,10 +29,15 @@ function SplashScreen() {
 
 function Register({route}) {
   const email = route.params.email
+  const school = route.params.school
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const [{signUp}, state] = React.useContext(AuthContext);
+  console.log(email)
+  console.log(email)
+  console.log(school)
+  console.log(school)
 
   return (
     <View>
@@ -47,7 +52,7 @@ function Register({route}) {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign up" onPress={() => signUp({ username, password, email })} />
+      <Button title="Sign up" onPress={() => signUp({ username, password, email})} />
     </View>
   );
 }
@@ -96,7 +101,7 @@ export default function App({ navigation }) {
       return fetch("http:/192.168.86.108/getinfofromtoken/",{
         method:"GET",
         headers:{  
-          'Authorization': state.access,
+          'Authorization': state.accesstoken,
         },
         //body: JSON.stringify({'token':data.token})
         
@@ -104,6 +109,7 @@ export default function App({ navigation }) {
       
     }
     const userData12 = await UserDataget(); 
+    console.log(userData12)
     dispatch({ type: 'SET_USER_DATA', username: userData12.username, school: userData12.school });
   }
   const [state, dispatch] = React.useReducer(
@@ -143,7 +149,7 @@ export default function App({ navigation }) {
       refreshtoken: null,
       accesstoken: null,
       username: "HELLO",
-      school: "fairfieldwarde",
+      school: null,
     }
   );
    React.useEffect(() => {
@@ -181,7 +187,7 @@ export default function App({ navigation }) {
     // Fetch the token from storage then navigate to our appropriate plac
 
     if (state.accesstoken != null){
-     console.log("setuserdata")
+     SetUserData()
     }
   }, [state.accesstoken]);
 
@@ -220,7 +226,7 @@ export default function App({ navigation }) {
           headers:{ 
             'Content-Type':"application/json"
           },
-          body: JSON.stringify({'username':data.username,'password':data.password,'email':data.email})
+          body: JSON.stringify({'username':data.username,'password':data.password,'email':data.email, "school": data.school})
           
         }).then(response => response.json());
       }
@@ -271,7 +277,7 @@ export default function App({ navigation }) {
     }else {
       console.log(data)
     }
-    if(loading){
+    if(loading == true){
       setLoading(false)
   }
 }

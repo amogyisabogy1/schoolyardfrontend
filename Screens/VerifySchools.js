@@ -27,30 +27,28 @@ export default function App() {
     }
   }, [response]);
   
-  const fetchSchool = () =>{
-    fetch("http:/192.168.86.108/verifyschool/",{ 
-        method:"POST", 
-        headers : { 
-            "Content-Type":"application/json"
-        }, 
-        body: JSON.stringify({email:userInfo})
-    })
-    .then(data => setSchool(data))
-    .then(()=>{
-      navigateSchool()
-    })
-    
-  }
-   
-  
-function navigateSchool(){
-   if(school.length > 1){
-       navigation.navigate('SelectSchool',{data:school, email: userInfo})
-   }
-   else{
+  async function Verify(email){
+   async function VerifySchool1(emaillol){
+        
+    return fetch("http:/192.168.86.108/verifyschool/",{
+      method:"POST",
+      headers:{ 
+        'Content-Type':"application/json"
+      },
+      body: JSON.stringify({'email':emaillol})
       
-       navigation.navigate('Register',{email:userInfo, school:school})
-   }
+    }).then(response => response.json());
+  }
+  const schoolverified = await VerifySchool1(email);
+  console.log(schoolverified)
+  setSchool(schoolverified)
+  navigateSchool(schoolverified, email)
+} 
+  
+function navigateSchool(schools, email1){
+   
+   navigation.navigate('Register',{email:email1, school:schools})
+   
 }
  
 
@@ -67,14 +65,12 @@ function navigateSchool(){
     })
 
     userInfoResponse.json().then(data => {
-      
-      setUserInfo(data.email);
-      
+      console.log(data)
+      setUserInfo(data)
+      console.log(data.email)
+      Verify(data.email)
     })
-    .then(data =>{
-        
-        fetchSchool();
-    });
+
     
   }
 
