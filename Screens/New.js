@@ -1,10 +1,14 @@
 import React , {useState} from 'react'
 import { StyleSheet, Text, View } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
-import AuthContext from "../App"
+import {AuthContext} from "../App"
 
 function New(props) {
  const [{signUp}, state] = React.useContext(AuthContext);
+ console.log(state.username)
+ console.log(state.username)
+ console.log(state.username)
+ console.log(state.username)
  const [title,setTitle] = useState()
  
 
@@ -14,11 +18,9 @@ function New(props) {
         method:"POST",
         headers : { 
             "Content-Type":"application/json",
-            'Authorization': state.accesstoken,
         }, 
         body: JSON.stringify({title:title, username:state.username, school:state.school})
     })
-    .then(resp => resp.json())
     .then(data =>{
         props.navigation.navigate("Home")
     })

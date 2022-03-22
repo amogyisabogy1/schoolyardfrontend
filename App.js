@@ -21,7 +21,7 @@ function SplashScreen() {
     </View>
   );
 }
-
+ 
 
 
 
@@ -49,7 +49,7 @@ function Register({route}) {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign up" onPress={() => signUp({ username, password, email})} />
+      <Button title="Sign up" onPress={() => signUp({ username, password, email, school})} />
     </View>
   );
 }
@@ -100,6 +100,7 @@ export default function App({ navigation }) {
       },        
     }).then(response => response.json());
 
+ console.log(res.school[0])
  console.log(res)
  dispatch({ type: 'SET_USER_DATA', school: res.school, username: res.username });
 } 
