@@ -1,27 +1,39 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, TextInput, ScrollView, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView, FlatList , SectionList,SafeAreaView} from 'react-native';
 import {Button, Card} from "react-native-paper"
+import  {AuthContext}  from '../App'
+import { useNavigation } from '@react-navigation/native';
+import Comment from './comment';
 
 function Postdetail(props) {
     const data = props.route.params.data;
+    console.log(data)
+    console.log(data)
+    console.log(data)
+    console.log(data)
+    console.log(data)
+    const [{signUp}, state] = React.useContext(AuthContext);
+    const groupname = props.route.params.group;
     const {id, title} =props.route.params.data;
     const [text, changeText] = React.useState(null);
     const [comment, changeComment] = React.useState([{text:"Comment"}]);
-
+  
     useEffect(()=>{
-      fetch(`http:/192.168.86.108/comment/${data.id}/`,{
+      console.log(data)
+      console.log(data)
+      fetch(`http:/192.168.86.122/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
       .then(data => {
         changeComment(data)
-        console.log(comment)   
+       
       })    
 
     },[])
   
     const deletedData = (data) => {
-      fetch(`http:/192.168.86.108/snippets/${data.id}/`,{
+      fetch(`http:/192.168.86.122/snippets/${data.id}/`,{
         method:"DELETE",
         headers: { 
           "Content-type":"application/json"
@@ -29,28 +41,43 @@ function Postdetail(props) {
       })
       .then(
         data =>{
+          
           props.navigation.navigate("Home")
+          
         }
       )
     
     }
+    const loadData = () =>{
+      fetch(`http:/192.168.86.122/comment/${data.id}/`,{
+        method:"GET"
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        changeComment(data)
+       
+      })    
+
+   }
     const addComment = () =>{
-      fetch("http:/192.168.86.108/comment/",{
+      fetch("http:/192.168.86.122/comment/",{
           method:"POST",
           headers : {   
               "Content-Type":"application/json"
           },  
-          body: JSON.stringify({text:text, postid:id})
+          body: JSON.stringify({text:text, postid:id, username:state.username, school:state.school})
       })
       .then(resp => resp.json())
+      .then(()=>{changeText("")})
+      .then(()=>{loadData()})
       
       
    }
    const renderdata = (item) =>{
     return (  
-    <Card style={styles.cardStyle} >
-    <Text>{item.text}</Text> 
-    </Card>
+    <View style={{ flex: 1}}>
+    <Comment postid = {data.id} id = {item.id} username={item.username} replies={item.data} text={item.text} changeComment={changeComment}/>
+    </View>
     )}
 
    return ( 
@@ -85,15 +112,19 @@ function Postdetail(props) {
           onPress={() => addComment()}
            >Comment</Button>
     </View>
-    <View>
+    <SafeAreaView style={{flex: 1}}>
+    <View style={styles.flatListWrapper}>
       <FlatList
       data = {comment}
       renderItem={({item})=>{
         return renderdata(item)
       }}
       keyExtractor={item => `${item.id}`}
+      style={{flex:1,minHeight:400}}
+      
       />
     </View>
+    </SafeAreaView>
    </View>
       
      
@@ -106,6 +137,10 @@ const styles = StyleSheet.create({
         margin:10,
         padding:10,
 
+    },
+    flatListWrapper: {
+      flex: 1,
+      flexGrow: 1
     },
     input: {
       height: 40,

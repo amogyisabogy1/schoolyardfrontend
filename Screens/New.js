@@ -14,7 +14,7 @@ function New(props) {
 
     
  const insertData = () =>{
-    fetch("http:/192.168.86.108/newpost/",{
+    fetch("http:/192.168.86.122/newpost/",{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",

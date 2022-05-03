@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, Text, Image, Button } from 'react-native';
+import { StyleSheet, View, Text, Image } from 'react-native';
+import {TextInput, Button} from 'react-native-paper';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
@@ -30,7 +31,7 @@ export default function App() {
   async function Verify(email){
    async function VerifySchool1(emaillol){
         
-    return fetch("http:/192.168.86.108/verifyschool/",{
+    return fetch("http:/192.168.86.122/verifyschool/",{
       method:"POST",
       headers:{ 
         'Content-Type':"application/json"
@@ -75,14 +76,26 @@ function navigateSchool(schools, email1){
   }
 
 
+
   return (
-    <View>
-      
-      <Button 
-        title={"Verify School"}
-        onPress={ () => { promptAsync({ showInRecents: true}) }}
+    <View  style={{ backgroundColor: '#FFFFFF'}}>
+      <Image
+      style={{justifyContent:'center', marginLeft:60, marginTop:35}}
+        source={  require("../assets/schoolyard.png")}
       />
-      <Text onPress={()=>{navigation.navigate("SignInScreen")}}>Sign In </Text>
+      
+      
+      <Button
+                    mode = "contained"
+                    onPress={()=> {promptAsync({ showInRecents: true})}}
+                    style={{margin:10, marginTop:245}}>Find your school
+                </Button>
+      <Button
+                    mode = "contained"
+                    onPress={()=> {navigation.navigate("SignInScreen")}}
+                    style={{margin:2 ,marginTop:5}}>Already have an account?Sign in 
+                </Button>
+     
       <StatusBar style="auto" />
     </View>
   );

@@ -1,42 +1,79 @@
 import react from 'react';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import {useState, useEffect, useContext} from 'react';
-import { StyleSheet, Text, View, Button, FlatList, Alert } from 'react-native';
-import {Card, Title, FAB} from "react-native-paper";
+import { StyleSheet, Text, View, Button, FlatList, Alert, Modal, Pressable, TouchableOpacity, TextInput} from 'react-native';
+import {Card, Title, FAB} from "react-native-paper"; 
 import postdetails from './Postdetails';
 import * as SecureStore from 'expo-secure-store';
 import  {AuthContext}  from '../App'
+import { useNavigation } from '@react-navigation/native';
+import { MaterialHeaderButtons } from './MyHeaderbutton';
+import { Item } from 'react-navigation-header-buttons';
 
 
+function Home({props, navigation}) {
 
-
- 
-function Home(props) {
-    const [{signUp}, state] = React.useContext(AuthContext);
-    console.log(state.username)
-    console.log(state.school)
-    
+    const [modalVisible, setModalVisible] = useState(false);
+    const [text, onChangeText] = React.useState("");
     const [data,setData] = useState("")
     const [loading,setLoading] = useState(true)
-  
+    const [{signUp}, state] = React.useContext(AuthContext);
+    
+    React.useLayoutEffect(() => {
+      navigation.setOptions({
+        // use MaterialHeaderButtons with consistent styling across your app
+        headerRight: () => ( 
+          <MaterialHeaderButtons>
+            <Item title="add" iconName="search" onPress={() => console.warn('add')} />
+            <Item title="profile" onPress={() => navigation.navigate("Profile")} />
+          </MaterialHeaderButtons>
+        ),
+      });
+    }, [navigation]);
     const loadData = () => {
-        fetch("http:/192.168.86.108/snippets/",{
-            method:"GET",
-            
-        })
-        .then(resp => resp.json())
-        .then(data =>{
-            setData(data)
-            setLoading(false)
-         })
-        .catch(error => Alert.alert("error"))
+      
+      console.log(state.school)
+      fetch(`http:/192.168.86.122/getposts/${state.school}/`,{
+        method:"GET",
+        headers:{  
+            'Authorization': state.accesstoken,
+          },
+    })
+    .then(resp => resp.json())
+    .then(data =>{
+        setData(data)
+        setLoading(false)
+     })
+    
 
-    }
+  }
+    const insertData = () =>{
+        
+        setModalVisible(!modalVisible)
+        fetch(`http:/192.168.86.122/newpost/`,{
+            method:"POST",
+            headers : { 
+                "Content-Type":"application/json",
+            },     
+            body: JSON.stringify({title:text, username:state.username, school:state.school})
+        })
+        
+         loadData()
+     }
+  
+   
     const openItem = (data) => {
-        props.navigation.navigate("detail", {data:data})
+        navigation.navigate("detail", {data:data})
     }
     useEffect(()=>{
-        fetch("http:/192.168.86.108/snippets/",{
+      console.log(state)
+      console.log(state.school)
+      if (state.school != null){
+       console.log(state.school)
+       console.log(state.school)
+       console.log(state.school)
+       fetch(`http:/192.168.86.122/getposts/${state.school}/`,{
             method:"GET",
             headers:{  
                 'Authorization': state.accesstoken,
@@ -47,16 +84,17 @@ function Home(props) {
             setData(data)
             setLoading(false)
          })
-        .catch(error => Alert.alert("error"))
-     },[])
+        }
+     },[state.school,state.username]) 
     const renderdata = (item) =>{
         return (  
         <Card style={styles.cardStyle}  onPress={()=> openItem(item)}>
+        <Text style = {{fontSize:8}}>{item.username}</Text>
         <Text style = {{fontSize:25}}>{item.title}</Text> 
         </Card>
         )}
     return (
-        <View>
+        <View style={{flex:1}}>
          <FlatList
             data = {data}
             renderItem={({item})=>{
@@ -71,10 +109,54 @@ function Home(props) {
             style = {styles.fab}
             small = {false}
             icon = "plus"
-
-            onPress={() => props.navigation.navigate("new")}
+            theme = {{colors:{accent:"blue"}}}
+            onPress={() => {setModalVisible(!modalVisible)}}
         />
+  <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles1.centeredView}>
+        
+          
+          <View style={styles1.modalView}> 
+          <Pressable onPress={() => setModalVisible(!modalVisible)}>
+  <Text style={{margin:5,padding:5}}>X</Text>
+</Pressable> 
+              <TextInput
+              multiline
+              numberOfLines={4}
+              placeholder="Enter your post"
+         style={{margin:5,
+            paddingHorizontal:20,
+            justifyContent: 'center',
+            borderWidth: 1,             
+        }}
+
+        onChangeText={onChangeText}
+        value={text}
+      />  
+          
+              <Pressable
+              style={[styles1.button, styles1.buttonClose]}
+              onPress={() => { insertData() }}
+            >
+              <Text style={styles1.textStyle}>  Post</Text>
+            </Pressable> 
+            
+          </View>
+
         </View>
+        
+           
+
+      </Modal>
+        </View>
+        
        
     )
 }
@@ -90,7 +172,52 @@ const styles = StyleSheet.create({
         margin:16,
         right:0,
         bottom:0,
-        backgroundColor:"blue"
     }
   });
+  const styles1 = StyleSheet.create({
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5
+    },
+    button: {
+      borderRadius: 20,
+      padding: 10,
+      elevation: 2
+    },
+    buttonOpen: {
+      backgroundColor: "#F194FF",
+    },
+    buttonClose: {
+      backgroundColor: "#2196F3",
+    },
+    textStyle: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: "center"
+    }
+  });
+
+
+
 export default Home

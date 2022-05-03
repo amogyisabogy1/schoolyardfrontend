@@ -1,18 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View,Button, TextInput,Alert } from 'react-native';
 import Home from "./Screens/Home";
 import New from "./Screens/New";
 import Postdetail from './Screens/Postdetails';
+import Commentdetail from './Screens/commentdetail';
+import Comment from './Screens/comment';
 import SelectSchool from './Screens/SelectSchool';
 import VerifySchool from './Screens/VerifySchools';
+import GroupDetails from './Screens/GroupDetails';
+import Newgrouppost from './Screens/Newgrouppost';
+import Profile from './Screens/Profile';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import react from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Group from './Screens/Group';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+
+
+
 
 export const AuthContext = React.createContext();
+
+const Tab = createBottomTabNavigator();
 
 function SplashScreen() {
   return (
@@ -34,6 +47,17 @@ function Register({route}) {
   const [password, setPassword] = React.useState('');
 
   const [{signUp}, state] = React.useContext(AuthContext);
+  function SignUp1234(){
+    if(username == ''){
+      Alert.alert('Username is required');
+    }
+    else if (password== ''){
+      Alert.alert('password is required');
+    } 
+    else{
+      signUp({ username, password, email, school})
+    }
+  }
 
 
   return (
@@ -49,7 +73,7 @@ function Register({route}) {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Sign up" onPress={() => signUp({ username, password, email, school})} />
+      <Button title="Sign up" onPress={() => {SignUp1234()}} />
     </View>
   );
 }
@@ -57,6 +81,7 @@ function Register({route}) {
 function SignInScreen() {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [{signIn}, state] = React.useContext(AuthContext);
 
   const [usernamestate, setusernamestate] = React.useState(username)
  
@@ -65,7 +90,7 @@ function SignInScreen() {
       <TextInput
         placeholder="Username"
         value={username}
-        onChangeText={setUsername}
+        onChangeText={setUsername}n
       />
       <TextInput
         placeholder="Password"
@@ -90,17 +115,17 @@ async function save(key, value) {
 export default function App({ navigation }) {
   
   const [loading,setLoading] = React.useState(true);
-  
+   
   
   async function Verify(){    
-    const res = await fetch("http:/192.168.86.108/getinfofromtoken/",{
+    const res = await fetch("http:/192.168.86.122/getinfofromtoken/",{
       method:"GET",
       headers:{  
         'Authorization': state.accesstoken,
       },        
     }).then(response => response.json());
 
- console.log(res.school[0])
+ console.log(res)
  console.log(res)
  dispatch({ type: 'SET_USER_DATA', school: res.school, username: res.username });
 } 
@@ -126,7 +151,8 @@ export default function App({ navigation }) {
           return {
             ...prevState,
             isSignout: true,
-            userToken: null,
+            accesstoken: null,
+            refreshtoken: null,
           };
         case 'SET_USER_DATA':
           return {
@@ -193,7 +219,7 @@ export default function App({ navigation }) {
         // In the example, we'll use a dummy token
         async function Signinlol1(){
         
-          return fetch("http:/192.168.86.108/token/",{
+          return fetch("http:/192.168.86.122/token/",{
             method:"POST",
             headers:{ 
               'Content-Type':"application/json"
@@ -210,11 +236,14 @@ export default function App({ navigation }) {
         
 
       },
-      signOut: () => dispatch({ type: 'SIGN_OUT' }),
+      signOut: () => {
+        dispatch({ type: 'SIGN_OUT' })
+        console.log(state.accesstoken)
+      },
       signUp: async (data) => {
        async function Signuplol(){
         
-        return fetch("http:/192.168.86.108/register/",{
+        return fetch("http:/192.168.86.122/register/",{
           method:"POST",
           headers:{ 
             'Content-Type':"application/json"
@@ -252,7 +281,7 @@ export default function App({ navigation }) {
 
   let updateToken = async ()=> {
     
-    let response = await fetch('http://192.168.86.108/token/refresh/', {
+    let response = await fetch('http://192.168.86.122/token/refresh/', {
         method:'POST',
         headers:{
             'Content-Type':'application/json'
@@ -272,6 +301,39 @@ export default function App({ navigation }) {
   }
 }
 
+function getHeaderTitle(route) {
+  // If the focused route is not found, we need to assume it's the initial screen
+  // This can happen during if there hasn't been any navigation inside the screen
+  // In our case, it's "Feed" as that's the first screen inside the navigator
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home1';
+
+  switch (routeName) {
+    case 'Home1':
+      return 'Home';
+    case 'Groups':
+      return 'Group';
+    
+  }
+}
+function Home1() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Home1" component={Home}   options={{...headerstyles,title:"Home"}}/>
+      <Tab.Screen name="Groups" component={Group}  options={{...headerstyles,title:"groups "}}  />
+    </Tab.Navigator>
+  );
+}
+
+function MyStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="commentdetail" component={Commentdetail} />
+    </Stack.Navigator>
+  );
+}
+
+
   return (
     <AuthContext.Provider value={[authContext,state]}>
     <NavigationContainer>
@@ -282,7 +344,7 @@ export default function App({ navigation }) {
           <React.Fragment>
           
           <Stack.Screen name="VerifySchool" component = {VerifySchool}
-          options = {{...headerstyles,title:"Verify school"}} /> 
+          options = {{...headerstyles,title:"Verify school", headerShown:false}} /> 
           <Stack.Screen name="SignInScreen" component = {SignInScreen}
           options = {{...headerstyles,title:"Sign in"}} /> 
           <Stack.Screen name="SelectSchool" component = {SelectSchool}
@@ -292,17 +354,26 @@ export default function App({ navigation }) {
           options = {{...headerstyles,title:"Register"}} /> 
           
          </React.Fragment>
-    
+     
          ) : (
          <React.Fragment>
-          <Stack.Screen name="Home" component = {Home}
-          options = {headerstyles} /> 
+          <Stack.Screen name="Home" component = {Home1}
+          options = {{headerShown:false}}/> 
+          <Stack.Screen name="commentdetail" component = {Commentdetail} options = {{...headerstyles,title:"Comment detail"}} /> 
           <Stack.Screen name="new" component = {New}
           options = {{...headerstyles,title:"Create New Post"}} /> 
           <Stack.Screen name="detail" component = {Postdetail}
           options = {{...headerstyles,title:"View details"}} />
-          
-         </React.Fragment>
+          <Stack.Screen name="Groupdetails" component = {GroupDetails}
+          options = { ({ route }) => ({...headerstyles,title: route.params.name })} />
+          <Stack.Screen name="Postingroup" component = {Newgrouppost}
+          options = {{...headerstyles,title:"Post in Group"}} />
+          <Stack.Screen name="Comment" component = {Comment}
+          options = {{...headerstyles,title:"Post in Group"}} />
+          <Stack.Screen name="Profile" component = {Profile}
+          options = {{...headerstyles,title:"Profile"}} /> 
+         </React.Fragment> 
+            
         )}
       </Stack.Navigator>
     </NavigationContainer>
