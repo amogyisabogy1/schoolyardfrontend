@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import Comment from './comment';
 
 function Postdetail(props) {
+    const anonymous = props.route.params.anonymous;
     const data = props.route.params.data;
     console.log(data)
     console.log(data)
@@ -21,7 +22,7 @@ function Postdetail(props) {
     useEffect(()=>{
       console.log(data)
       console.log(data)
-      fetch(`http:/192.168.86.122/comment/${data.id}/`,{
+      fetch(`http:/10.62.2.249/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -33,7 +34,7 @@ function Postdetail(props) {
     },[])
   
     const deletedData = (data) => {
-      fetch(`http:/192.168.86.122/snippets/${data.id}/`,{
+      fetch(`http:/10.62.2.249/snippets/${data.id}/`,{
         method:"DELETE",
         headers: { 
           "Content-type":"application/json"
@@ -49,7 +50,7 @@ function Postdetail(props) {
     
     }
     const loadData = () =>{
-      fetch(`http:/192.168.86.122/comment/${data.id}/`,{
+      fetch(`http:/10.62.2.249/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -60,7 +61,7 @@ function Postdetail(props) {
 
    }
     const addComment = () =>{
-      fetch("http:/192.168.86.122/comment/",{
+      fetch("http:/10.62.2.249/comment/",{
           method:"POST",
           headers : {   
               "Content-Type":"application/json"
@@ -85,15 +86,24 @@ function Postdetail(props) {
    <View>
     <View style = {styles.detailStyle}>
        <Card>
-        <Text>{data.username}</Text>
+       {anonymous == true ?
+          null : <Text onPress={()=>{props.navigation.navigate('profile',{username:data.username})}}>{data.username}</Text>}
+        
         <Text style = {{fontSize:25}}>
-          
+        
+           
           {data.title}
         </Text>
        </Card>
         <View>
+          {state.username == data.username ?
+          <View style={{justifyContent:"row"}}>
           <Button icon = "delete"
           mode = "contained" onPress={() => deletedData(data)} style = {{marginTop:30}}>Delete</Button>
+          <Button icon = "Edit"
+          mode = "contained" onPress={() => props.navigation.navigate("Edit",{data:data})} style = {{marginTop:30}}>Edit</Button>
+          </View>
+          : null}
         </View>
 
     </View>

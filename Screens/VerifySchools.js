@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, ImageBackground } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -14,6 +14,7 @@ export default function App() {
   const [userInfo, setUserInfo] = React.useState();
   const [message, setMessage] = React.useState();
   const [school, setSchool] = React.useState();
+  const localimage = require("../assets/schoolyardbg.png")
 
   const navigation = useNavigation();
 
@@ -31,7 +32,7 @@ export default function App() {
   async function Verify(email){
    async function VerifySchool1(emaillol){
         
-    return fetch("http:/192.168.86.122/verifyschool/",{
+    return fetch("http:/10.62.2.249/verifyschool/",{
       method:"POST",
       headers:{ 
         'Content-Type':"application/json"
@@ -78,9 +79,10 @@ function navigateSchool(schools, email1){
 
 
   return (
-    <View  style={{ backgroundColor: '#FFFFFF'}}>
+    <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
+      
       <Image
-      style={{justifyContent:'center', marginLeft:60, marginTop:35}}
+      style={{justifyContent:'center', marginLeft:60, marginTop:105}}
         source={  require("../assets/schoolyard.png")}
       />
       
@@ -88,7 +90,7 @@ function navigateSchool(schools, email1){
       <Button
                     mode = "contained"
                     onPress={()=> {promptAsync({ showInRecents: true})}}
-                    style={{margin:10, marginTop:245}}>Find your school
+                    style={{margin:10, marginTop:195}}>Find your school
                 </Button>
       <Button
                     mode = "contained"
@@ -97,6 +99,8 @@ function navigateSchool(schools, email1){
                 </Button>
      
       <StatusBar style="auto" />
-    </View>
+    </ImageBackground>
   );
+
+  
 }

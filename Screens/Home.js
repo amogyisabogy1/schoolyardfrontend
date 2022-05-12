@@ -2,7 +2,7 @@ import react from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import {useState, useEffect, useContext} from 'react';
-import { StyleSheet, Text, View, Button, FlatList, Alert, Modal, Pressable, TouchableOpacity, TextInput} from 'react-native';
+import { StyleSheet, Text, View, Button, FlatList, Alert, Modal, Pressable, TouchableOpacity, ImageBackground, TextInput} from 'react-native';
 import {Card, Title, FAB} from "react-native-paper"; 
 import postdetails from './Postdetails';
 import * as SecureStore from 'expo-secure-store';
@@ -12,6 +12,7 @@ import { MaterialHeaderButtons } from './MyHeaderbutton';
 import { Item } from 'react-navigation-header-buttons';
 
 
+
 function Home({props, navigation}) {
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -19,6 +20,8 @@ function Home({props, navigation}) {
     const [data,setData] = useState("")
     const [loading,setLoading] = useState(true)
     const [{signUp}, state] = React.useContext(AuthContext);
+    const localimage = require("../assets/schoolyardbg.png")
+
     
     React.useLayoutEffect(() => {
       navigation.setOptions({
@@ -34,7 +37,7 @@ function Home({props, navigation}) {
     const loadData = () => {
       
       console.log(state.school)
-      fetch(`http:/192.168.86.122/getposts/${state.school}/`,{
+      fetch(`http:/10.62.2.249/getposts/${state.school}/`,{
         method:"GET",
         headers:{  
             'Authorization': state.accesstoken,
@@ -51,7 +54,7 @@ function Home({props, navigation}) {
     const insertData = () =>{
         
         setModalVisible(!modalVisible)
-        fetch(`http:/192.168.86.122/newpost/`,{
+        fetch(`http:/10.62.2.249/newpost/`,{
             method:"POST",
             headers : { 
                 "Content-Type":"application/json",
@@ -73,7 +76,7 @@ function Home({props, navigation}) {
        console.log(state.school)
        console.log(state.school)
        console.log(state.school)
-       fetch(`http:/192.168.86.122/getposts/${state.school}/`,{
+       fetch(`http:/10.62.2.249/getposts/${state.school}/`,{
             method:"GET",
             headers:{  
                 'Authorization': state.accesstoken,
@@ -94,8 +97,9 @@ function Home({props, navigation}) {
         </Card>
         )}
     return (
-        <View style={{flex:1}}>
+        <ImageBackground source={localimage} style={{flex:1}}>
          <FlatList
+             
             data = {data}
             renderItem={({item})=>{
                 return renderdata(item)
@@ -155,7 +159,7 @@ function Home({props, navigation}) {
            
 
       </Modal>
-        </View>
+        </ImageBackground>
         
        
     )
@@ -165,6 +169,7 @@ const styles = StyleSheet.create({
     cardStyle: {
       margin: 10,
       padding: 10,
+      backgroundColor: "#ffe4c4"
       
     },  
     fab: {

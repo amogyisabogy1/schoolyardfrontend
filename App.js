@@ -1,14 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,Button, TextInput,Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput,Alert, ImageBackground } from 'react-native';
 import Home from "./Screens/Home";
 import New from "./Screens/New";
+import { Button} from 'react-native-paper';
+import Bio from './Screens/Bio';
 import Postdetail from './Screens/Postdetails';
 import Commentdetail from './Screens/commentdetail';
 import Comment from './Screens/comment';
 import SelectSchool from './Screens/SelectSchool';
+import Edit from './Screens/Edit';
 import VerifySchool from './Screens/VerifySchools';
 import GroupDetails from './Screens/GroupDetails';
 import Newgrouppost from './Screens/Newgrouppost';
+import Vent from './Screens/Vent';
 import Profile from './Screens/Profile';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -26,6 +30,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 export const AuthContext = React.createContext();
 
 const Tab = createBottomTabNavigator();
+const localimage = require("./assets/schoolyardbg.png")
 
 function SplashScreen() {
   return (
@@ -35,7 +40,7 @@ function SplashScreen() {
   );
 }
  
-
+ 
 
 
 
@@ -61,47 +66,37 @@ function Register({route}) {
 
 
   return (
-    <View>
+    <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
+    
       <TextInput
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+        style={{    
+          marginTop: 10,
+          height: 40,
+          margin: 12,
+          borderWidth: 1,
+          padding: 10,}}
       />
       <TextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        style={{  
+          marginTop: 1,  
+          height: 40,
+          margin: 12,
+          borderWidth: 1,
+          padding: 10,}} 
       />
-      <Button title="Sign up" onPress={() => {SignUp1234()}} />
-    </View>
+      <Button style = {{marginTop:200}}onPress={() => {SignUp1234()}} mode = "contained"> Register </Button>
+      </ImageBackground> 
   );
 }
 
-function SignInScreen() {
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [{signIn}, state] = React.useContext(AuthContext);
 
-  const [usernamestate, setusernamestate] = React.useState(username)
- 
-  return (
-    <View>
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}n
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Sign in" onPress={() => signIn({ username, password })} />
-    </View>
-  );
-}
 
 const Stack = createStackNavigator();
 
@@ -118,7 +113,7 @@ export default function App({ navigation }) {
    
   
   async function Verify(){    
-    const res = await fetch("http:/192.168.86.122/getinfofromtoken/",{
+    const res = await fetch("http:/10.62.2.249/getinfofromtoken/",{
       method:"GET",
       headers:{  
         'Authorization': state.accesstoken,
@@ -213,14 +208,14 @@ export default function App({ navigation }) {
   const authContext = React.useMemo(
     () => ({
       signIn: async (data) => {
-        // In a production app, we need to send some data (usually username, password) to server and get a token
-        // We will also need to handle errors if sign in failed
-        // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
-        // In the example, we'll use a dummy token
-        async function Signinlol1(){
-        
-          return fetch("http:/192.168.86.122/token/",{
-            method:"POST",
+        console.log(data)
+        console.log(data)
+        console.log(data.password)
+        console.log(data.username)
+        async function Signuplol(){
+         
+          return fetch("http:/10.62.2.249/token/",{
+            method:"POST", 
             headers:{ 
               'Content-Type':"application/json"
             },
@@ -228,11 +223,13 @@ export default function App({ navigation }) {
             
           }).then(response => response.json());
         }
-        const usertokens123 = await Signinlol1();
-
-        save("refreshtoken", usertokens123.refresh)
-        save("usertoken", usertokens123.access)
-        dispatch({ type: 'SIGN_IN', refreshtoken: usertokens123.refresh, accesstoken: usertokens123.access });
+        const usertokens12 = await Signuplol();
+        save("refreshtoken", usertokens12.refresh)
+        save("usertoken", usertokens12.access)
+          
+        dispatch({ type: 'SIGN_IN', refreshtoken: usertokens12.refresh, accesstoken:usertokens12.access });
+        
+        
         
 
       },
@@ -243,7 +240,7 @@ export default function App({ navigation }) {
       signUp: async (data) => {
        async function Signuplol(){
         
-        return fetch("http:/192.168.86.122/register/",{
+        return fetch("http:/10.62.2.249/register/",{
           method:"POST",
           headers:{ 
             'Content-Type':"application/json"
@@ -281,7 +278,7 @@ export default function App({ navigation }) {
 
   let updateToken = async ()=> {
     
-    let response = await fetch('http://192.168.86.122/token/refresh/', {
+    let response = await fetch('http://10.62.2.249/token/refresh/', {
         method:'POST',
         headers:{
             'Content-Type':'application/json'
@@ -320,6 +317,7 @@ function Home1() {
     <Tab.Navigator>
       <Tab.Screen name="Home1" component={Home}   options={{...headerstyles,title:"Home"}}/>
       <Tab.Screen name="Groups" component={Group}  options={{...headerstyles,title:"groups "}}  />
+      <Tab.Screen name="Vent" component={Vent}  options={{...headerstyles,title:"Vent "}}  />
     </Tab.Navigator>
   );
 }
@@ -359,6 +357,10 @@ function MyStack() {
          <React.Fragment>
           <Stack.Screen name="Home" component = {Home1}
           options = {{headerShown:false}}/> 
+          <Stack.Screen name="Edit" component = {Edit}
+          options = {{...headerstyles,title:"Edit post"}} /> 
+          <Stack.Screen name="ProfileSettings" component = {Bio}
+          options = {{...headerstyles,title:"Profile Settings"}} /> 
           <Stack.Screen name="commentdetail" component = {Commentdetail} options = {{...headerstyles,title:"Comment detail"}} /> 
           <Stack.Screen name="new" component = {New}
           options = {{...headerstyles,title:"Create New Post"}} /> 
@@ -386,8 +388,60 @@ function MyStack() {
   
   
   const headerstyles = StyleSheet.create({
+    headerStyle: {
+      backgroundColor: '#f4511e',
+    },
     container: {
-      flex: 1,
+      flex: 1, 
       backgroundColor: '#eddfdf', 
     },
   });
+  function SignInScreen() {
+    const [username, setUsername] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [{signIn}, state] = React.useContext(AuthContext);
+  
+    const [usernamestate, setusernamestate] = React.useState(username)
+    function signInlol(){
+        if(username == ''){
+          Alert.alert('Username is required');
+        }
+        else if (password== ''){
+          Alert.alert('password is required');
+        } 
+        else{
+          signIn({ username, password})
+        }
+    }
+    
+    
+    return (
+      <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
+      
+        <TextInput 
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          style={{    
+            marginTop: 10,
+            height: 40,
+            margin: 12,
+            borderWidth: 1, 
+            padding: 10,}}
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={{   
+            marginTop: 1,  
+            height: 40,
+            margin: 12,
+            borderWidth: 1,
+            padding: 10,}} 
+        />
+        <Button style = {{marginTop:200}}onPress={() => signInlol()} mode = "contained"> Sign In </Button>
+        </ImageBackground> 
+    );
+  } 

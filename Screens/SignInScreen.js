@@ -1,4 +1,4 @@
- import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, View, Text, Image, Button,TextInput } from 'react-native';
 import * as Google from 'expo-auth-session/providers/google';
@@ -15,7 +15,7 @@ export default function SignInScreen() {
     
     
     function LogIn() {
-      fetch("http:/192.168.86.122/token/",{
+      fetch("http:/10.62.2.249/token/",{
         method:"POST",
         headers:{
           'Content-Type':"application/json"
