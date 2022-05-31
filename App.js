@@ -8,7 +8,9 @@ import Postdetail from './Screens/Postdetails';
 import Commentdetail from './Screens/commentdetail';
 import Comment from './Screens/comment';
 import SelectSchool from './Screens/SelectSchool';
-import Edit from './Screens/Edit';
+import SeeProfile from './Screens/Seeprofile';
+import Edit from './Screens/Edit'; 
+import Seeprofile from './Screens/Seeprofile';
 import VerifySchool from './Screens/VerifySchools';
 import GroupDetails from './Screens/GroupDetails';
 import Newgrouppost from './Screens/Newgrouppost';
@@ -23,7 +25,8 @@ import react from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Group from './Screens/Group';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+  
 
 
 
@@ -47,12 +50,20 @@ function SplashScreen() {
 
 function Register({route}) {
   const email = route.params.email
+  console.log(email)
+  console.log(email)
+  console.log(email)  
   const school = route.params.school
+  console.log(school)
+  console.log(school) 
+  length = school.length
+  const schools1 = school.slice(2, length);
+ 
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const [{signUp}, state] = React.useContext(AuthContext);
-  function SignUp1234(){
+  function SignUp1234(){ 
     if(username == ''){
       Alert.alert('Username is required');
     }
@@ -69,9 +80,11 @@ function Register({route}) {
     <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
     
       <TextInput
+        maxLength={500}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+        placeholderTextColor = "#D50000"
         style={{    
           marginTop: 10,
           height: 40,
@@ -83,6 +96,7 @@ function Register({route}) {
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
+        placeholderTextColor = "#D50000"
         secureTextEntry
         style={{  
           marginTop: 1,  
@@ -113,7 +127,7 @@ export default function App({ navigation }) {
    
   
   async function Verify(){    
-    const res = await fetch("http:/10.62.2.249/getinfofromtoken/",{
+    const res = await fetch("http:/192.168.86.141/getinfofromtoken/",{
       method:"GET",
       headers:{  
         'Authorization': state.accesstoken,
@@ -214,7 +228,7 @@ export default function App({ navigation }) {
         console.log(data.username)
         async function Signuplol(){
          
-          return fetch("http:/10.62.2.249/token/",{
+          return fetch("http:/192.168.86.141/token/",{
             method:"POST", 
             headers:{ 
               'Content-Type':"application/json"
@@ -234,13 +248,13 @@ export default function App({ navigation }) {
 
       },
       signOut: () => {
-        dispatch({ type: 'SIGN_OUT' })
+        dispatch({ type: 'SIGN_OUT' }) 
         console.log(state.accesstoken)
       },
       signUp: async (data) => {
        async function Signuplol(){
         
-        return fetch("http:/10.62.2.249/register/",{
+        return fetch("http:/192.168.86.141/register/",{
           method:"POST",
           headers:{ 
             'Content-Type':"application/json"
@@ -254,7 +268,9 @@ export default function App({ navigation }) {
       save("usertoken", usertokens12.accesstoken)
         
       dispatch({ type: 'SIGN_IN', refreshtoken: usertokens12.refreshtoken, accesstoken:usertokens12.accesstoken });
-      
+      console.log(state.refreshtoken)
+      updateToken()
+      console.log(state.refreshtoken)
       },
     }),
     []
@@ -267,7 +283,8 @@ export default function App({ navigation }) {
      }
 
     let interval = setInterval(() => {
-      if(state.refreshtoken){
+      if(state.refreshtoken != null){
+        console.log(state.refreshtoken)
         updateToken()
         
       }
@@ -277,9 +294,19 @@ export default function App({ navigation }) {
 
 
   let updateToken = async ()=> {
+    console.log("hi")
+    console.log(state)
+    console.log(state)
+    console.log(state.accesstoken)
+    console.log(state.refreshtoken)
+    console.log(state.refreshtoken)
+    console.log(state.refreshtoken)
+    console.log(state.refreshtoken)
+    console.log(state.refreshtoken)
+    console.log("hi")
     
-    let response = await fetch('http://10.62.2.249/token/refresh/', {
-        method:'POST',
+    let response = await fetch('http://192.168.86.141/token/refresh/', {
+        method:'POST', 
         headers:{
             'Content-Type':'application/json'
         },
@@ -325,7 +352,8 @@ function Home1() {
 function MyStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Profile" component={Profile} />
+      <Stack.Screen name="Prof" options={{headerShown:false}} component={Profile} />
+      <Stack.Screen name="SeeProf" options={{headerShown:false}} component={SeeProfile} />
       <Stack.Screen name="commentdetail" component={Commentdetail} />
     </Stack.Navigator>
   );
@@ -333,6 +361,7 @@ function MyStack() {
 
 
   return (
+    <ActionSheetProvider>
     <AuthContext.Provider value={[authContext,state]}>
     <NavigationContainer>
       <Stack.Navigator>
@@ -361,6 +390,8 @@ function MyStack() {
           options = {{...headerstyles,title:"Edit post"}} /> 
           <Stack.Screen name="ProfileSettings" component = {Bio}
           options = {{...headerstyles,title:"Profile Settings"}} /> 
+          <Stack.Screen name="Seeprofile" component = {Seeprofile}
+          options = {{...headerstyles,title:"Profile"}} /> 
           <Stack.Screen name="commentdetail" component = {Commentdetail} options = {{...headerstyles,title:"Comment detail"}} /> 
           <Stack.Screen name="new" component = {New}
           options = {{...headerstyles,title:"Create New Post"}} /> 
@@ -372,14 +403,15 @@ function MyStack() {
           options = {{...headerstyles,title:"Post in Group"}} />
           <Stack.Screen name="Comment" component = {Comment}
           options = {{...headerstyles,title:"Post in Group"}} />
-          <Stack.Screen name="Profile" component = {Profile}
+          <Stack.Screen name="Profile" component = {MyStack}
           options = {{...headerstyles,title:"Profile"}} /> 
          </React.Fragment> 
             
         )}
       </Stack.Navigator>
-    </NavigationContainer>
+    </NavigationContainer> 
   </AuthContext.Provider>
+  </ActionSheetProvider>
   );
   }
   
@@ -389,7 +421,7 @@ function MyStack() {
   
   const headerstyles = StyleSheet.create({
     headerStyle: {
-      backgroundColor: '#f4511e',
+      backgroundColor: '#8a2be2',
     },
     container: {
       flex: 1, 
@@ -441,7 +473,7 @@ function MyStack() {
             borderWidth: 1,
             padding: 10,}} 
         />
-        <Button style = {{marginTop:200}}onPress={() => signInlol()} mode = "contained"> Sign In </Button>
+        <Button style = {{marginTop:20}}onPress={() => signInlol()} mode = "contained"> Sign In </Button>
         </ImageBackground> 
     );
   } 

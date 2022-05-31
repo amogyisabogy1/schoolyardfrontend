@@ -14,7 +14,7 @@ export default function App() {
   const [userInfo, setUserInfo] = React.useState();
   const [message, setMessage] = React.useState();
   const [school, setSchool] = React.useState();
-  const localimage = require("../assets/schoolyardbg.png")
+  const localimage = require("../assets/schoolyardbg1.png")
 
   const navigation = useNavigation();
 
@@ -32,7 +32,7 @@ export default function App() {
   async function Verify(email){
    async function VerifySchool1(emaillol){
         
-    return fetch("http:/10.62.2.249/verifyschool/",{
+    return fetch("http:/192.168.86.141/verifyschool/",{
       method:"POST",
       headers:{ 
         'Content-Type':"application/json"
@@ -42,14 +42,21 @@ export default function App() {
     }).then(response => response.json());
   }
   const schoolverified = await VerifySchool1(email);
+  console.log(schoolverified)
 
   setSchool(schoolverified)
   navigateSchool(schoolverified, email)
 } 
   
 function navigateSchool(schools, email1){
+   if (schools.length >=2){
+    navigation.navigate('SelectSchool',{email:email1, school:schools})
+
+   }else{
+    const schools1 = school.slice(2, length);
    
    navigation.navigate('Register',{email:email1, school:schools})
+   }
    
 }
  
@@ -85,7 +92,6 @@ function navigateSchool(schools, email1){
       style={{justifyContent:'center', marginLeft:60, marginTop:105}}
         source={  require("../assets/schoolyard.png")}
       />
-      
       
       <Button
                     mode = "contained"

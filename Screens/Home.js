@@ -10,6 +10,7 @@ import  {AuthContext}  from '../App'
 import { useNavigation } from '@react-navigation/native';
 import { MaterialHeaderButtons } from './MyHeaderbutton';
 import { Item } from 'react-navigation-header-buttons';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 
 
@@ -22,13 +23,35 @@ function Home({props, navigation}) {
     const [{signUp}, state] = React.useContext(AuthContext);
     const localimage = require("../assets/schoolyardbg.png")
 
+    const { showActionSheetWithOptions } = useActionSheet();
+    const onPress = () =>{
+    console.log("hi")
+    showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Generate number', 'Reset'],
+        destructiveButtonIndex: 2,
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+      },
+      buttonIndex => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else if (buttonIndex === 1) {
+          setResult(Math.floor(Math.random() * 100) + 1);
+        } else if (buttonIndex === 2) {
+          setResult('🔮');
+        }
+      }
+    );
+    }
+
     
     React.useLayoutEffect(() => {
       navigation.setOptions({
         // use MaterialHeaderButtons with consistent styling across your app
         headerRight: () => ( 
           <MaterialHeaderButtons>
-            <Item title="add" iconName="search" onPress={() => console.warn('add')} />
+            <Item title="..." onPress={() => onPress()} />
             <Item title="profile" onPress={() => navigation.navigate("Profile")} />
           </MaterialHeaderButtons>
         ),
@@ -37,7 +60,7 @@ function Home({props, navigation}) {
     const loadData = () => {
       
       console.log(state.school)
-      fetch(`http:/10.62.2.249/getposts/${state.school}/`,{
+      fetch(`http:/192.168.86.141/getposts/${state.school}/`,{
         method:"GET",
         headers:{  
             'Authorization': state.accesstoken,
@@ -52,9 +75,13 @@ function Home({props, navigation}) {
 
   }
     const insertData = () =>{
+        if(text==""){
+          Alert.alert("cannot create blank post!")
+        }else{
+        console.log(state)
         
         setModalVisible(!modalVisible)
-        fetch(`http:/10.62.2.249/newpost/`,{
+        fetch(`http:/192.168.86.141/newpost/`,{
             method:"POST",
             headers : { 
                 "Content-Type":"application/json",
@@ -63,6 +90,8 @@ function Home({props, navigation}) {
         })
         
          loadData()
+         onChangeText("")
+      }
      }
   
    
@@ -76,7 +105,7 @@ function Home({props, navigation}) {
        console.log(state.school)
        console.log(state.school)
        console.log(state.school)
-       fetch(`http:/10.62.2.249/getposts/${state.school}/`,{
+       fetch(`http:/192.168.86.141/getposts/${state.school}/`,{
             method:"GET",
             headers:{  
                 'Authorization': state.accesstoken,
@@ -85,19 +114,24 @@ function Home({props, navigation}) {
         .then(resp => resp.json())
         .then(data =>{
             setData(data)
+            console.log(data)
             setLoading(false)
          })
         }
      },[state.school,state.username]) 
     const renderdata = (item) =>{
         return (  
+        
         <Card style={styles.cardStyle}  onPress={()=> openItem(item)}>
         <Text style = {{fontSize:8}}>{item.username}</Text>
         <Text style = {{fontSize:25}}>{item.title}</Text> 
+        
         </Card>
+        
         )}
     return (
         <ImageBackground source={localimage} style={{flex:1}}>
+          
          <FlatList
              
             data = {data}
@@ -132,6 +166,7 @@ function Home({props, navigation}) {
   <Text style={{margin:5,padding:5}}>X</Text>
 </Pressable> 
               <TextInput
+              maxLength={500}
               multiline
               numberOfLines={4}
               placeholder="Enter your post"
@@ -169,7 +204,6 @@ const styles = StyleSheet.create({
     cardStyle: {
       margin: 10,
       padding: 10,
-      backgroundColor: "#ffe4c4"
       
     },  
     fab: {

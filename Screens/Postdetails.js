@@ -3,7 +3,10 @@ import { StyleSheet, Text, View, TextInput, ScrollView, FlatList , SectionList,S
 import {Button, Card} from "react-native-paper"
 import  {AuthContext}  from '../App'
 import { useNavigation } from '@react-navigation/native';
+import { MaterialHeaderButtons } from './MyHeaderbutton';
+import { Item } from 'react-navigation-header-buttons';
 import Comment from './comment';
+import { useActionSheet } from '@expo/react-native-action-sheet'; 
 
 function Postdetail(props) {
     const anonymous = props.route.params.anonymous;
@@ -18,11 +21,48 @@ function Postdetail(props) {
     const {id, title} =props.route.params.data;
     const [text, changeText] = React.useState(null);
     const [comment, changeComment] = React.useState([{text:"Comment"}]);
-  
+    const { showActionSheetWithOptions } = useActionSheet();
+    const save = () =>{
+      fetch("http:/192.168.86.141/AddToSaved/",{
+        method:"POST",
+        headers : {   
+            "Content-Type":"application/json"
+        },  
+        body: JSON.stringify({ postid:id, username:state.username, school:state.school})
+    })
+    }
+    const onPress1 = () =>{
+     console.log("hi")
+     showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Save'],
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+      },
+      buttonIndex => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else if (buttonIndex === 1) {
+          save()
+        } 
+      }
+    );
+    }
+    React.useLayoutEffect(() => {
+      props.navigation.setOptions({
+        // use MaterialHeaderButtons with consistent styling across your app
+        headerRight: () => ( 
+          <MaterialHeaderButtons>
+            <Item title="..." onPress={() => onPress1()} />
+            <Item title="profile" onPress={() => props.navigation.navigate("Profile")} />
+          </MaterialHeaderButtons>
+        ),
+      });
+    }, [props.navigation]);
     useEffect(()=>{
       console.log(data)
       console.log(data)
-      fetch(`http:/10.62.2.249/comment/${data.id}/`,{
+      fetch(`http:/192.168.86.141/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -34,7 +74,7 @@ function Postdetail(props) {
     },[])
   
     const deletedData = (data) => {
-      fetch(`http:/10.62.2.249/snippets/${data.id}/`,{
+      fetch(`http:/192.168.86.141/snippets/${data.id}/`,{
         method:"DELETE",
         headers: { 
           "Content-type":"application/json"
@@ -50,7 +90,7 @@ function Postdetail(props) {
     
     }
     const loadData = () =>{
-      fetch(`http:/10.62.2.249/comment/${data.id}/`,{
+      fetch(`http:/192.168.86.141/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -61,7 +101,7 @@ function Postdetail(props) {
 
    }
     const addComment = () =>{
-      fetch("http:/10.62.2.249/comment/",{
+      fetch("http:/192.168.86.141/comment/",{
           method:"POST",
           headers : {   
               "Content-Type":"application/json"
@@ -87,17 +127,20 @@ function Postdetail(props) {
     <View style = {styles.detailStyle}>
        <Card>
        {anonymous == true ?
-          null : <Text onPress={()=>{props.navigation.navigate('profile',{username:data.username})}}>{data.username}</Text>}
+          null : <Text onPress={()=>{props.navigation.navigate('SeeProf',{username:data.username})}}>{data.username}</Text>}
         
+        <View style={{flexDirection:"row"}}>
         <Text style = {{fontSize:25}}>
         
            
           {data.title}
         </Text>
+        
+        </View>
        </Card>
         <View>
           {state.username == data.username ?
-          <View style={{justifyContent:"row"}}>
+          <View>
           <Button icon = "delete"
           mode = "contained" onPress={() => deletedData(data)} style = {{marginTop:30}}>Delete</Button>
           <Button icon = "Edit"
