@@ -15,6 +15,7 @@ export default function App() {
   const [message, setMessage] = React.useState();
   const [school, setSchool] = React.useState();
   const localimage = require("../assets/schoolyardbg1.png")
+  const localimage1 = require("../assets/schoolyard.png")
 
   const navigation = useNavigation();
 
@@ -53,9 +54,8 @@ function navigateSchool(schools, email1){
     navigation.navigate('SelectSchool',{email:email1, school:schools})
 
    }else{
-    const schools1 = school.slice(2, length);
    
-   navigation.navigate('Register',{email:email1, school:schools})
+   navigation.navigate('Age',{email:email1, school:schools})
    }
    
 }
@@ -88,20 +88,17 @@ function navigateSchool(schools, email1){
   return (
     <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
       
-      <Image
-      style={{justifyContent:'center', marginLeft:60, marginTop:105}}
-        source={  require("../assets/schoolyard.png")}
-      />
-      
+    <Image style={{marginTop:50,marginLeft:50}}source={localimage1}/>
+      <Text style={{marginLeft:70, marginTop:195}}>Sign in with your school email below ↓</Text>
       <Button
                     mode = "contained"
                     onPress={()=> {promptAsync({ showInRecents: true})}}
-                    style={{margin:10, marginTop:195}}>Find your school
+                    style={{margin:50, marginBottom:10}}>Find your school
                 </Button>
       <Button
                     mode = "contained"
                     onPress={()=> {navigation.navigate("SignInScreen")}}
-                    style={{margin:2 ,marginTop:5}}>Already have an account?Sign in 
+                    style={{margin:30 ,marginTop:5}}>Already have an account?Log in 
                 </Button>
      
       <StatusBar style="auto" />

@@ -1,15 +1,27 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, TextInput, ScrollView, FlatList , SectionList,SafeAreaView} from 'react-native';
-import {Button, Card} from "react-native-paper"
+import {   View,
+  KeyboardAvoidingView,
+  TextInput,
+  StyleSheet,
+  Text,
+  Platform,
+  FlatList,
+  TouchableWithoutFeedback, 
+  
+  Keyboard,} from 'react-native';
+import { Button,Card} from "react-native-paper"
+import Ionicons from '@expo/vector-icons/Ionicons';
 import  {AuthContext}  from '../App'
 import { useNavigation } from '@react-navigation/native';
 import { MaterialHeaderButtons } from './MyHeaderbutton';
 import { Item } from 'react-navigation-header-buttons';
 import Comment from './comment';
-import { useActionSheet } from '@expo/react-native-action-sheet'; 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-function Postdetail(props) {
-    const anonymous = props.route.params.anonymous;
+import { useActionSheet } from '@expo/react-native-action-sheet'; 
+ 
+const Postdetails = (props) => {
+  const anonymous = props.route.params.anonymous;
     const data = props.route.params.data;
     console.log(data)
     console.log(data)
@@ -18,6 +30,7 @@ function Postdetail(props) {
     console.log(data)
     const [{signUp}, state] = React.useContext(AuthContext);
     const groupname = props.route.params.group;
+    const [numberofreplies, changenumberofreplies] =React.useState();
     const {id, title} =props.route.params.data;
     const [text, changeText] = React.useState(null);
     const [comment, changeComment] = React.useState([{text:"Comment"}]);
@@ -110,8 +123,10 @@ function Postdetail(props) {
       })
       .then(resp => resp.json())
       .then(()=>{changeText("")})
-      .then(()=>{loadData()})
-      
+      .then(()=>{loadData()});
+
+      data.numberofcomments = data.numberofcomments + 1
+     
       
    }
    const renderdata = (item) =>{
@@ -121,26 +136,34 @@ function Postdetail(props) {
     </View>
     )}
 
-   return ( 
-  
-   <View>
-    <View style = {styles.detailStyle}>
-       <Card>
+  return (
+
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+   
+        <View style={styles.inner}>
+        <Card style={{margin:15}}>
        {anonymous == true ?
-          null : <Text onPress={()=>{props.navigation.navigate('SeeProf',{username:data.username})}}>{data.username}</Text>}
+          null : <Text onPress={()=>{props.navigation.navigate('Seeprofile  ',{username:data.username})}}>{data.username}</Text>}
         
         <View style={{flexDirection:"row"}}>
         <Text style = {{fontSize:25}}>
         
            
           {data.title}
+          
+          
         </Text>
         
         </View>
-       </Card>
         <View>
+        <Text onPress={()=>{save()}}>Save</Text>
+        </View>
+       </Card>
+       <View>
           {state.username == data.username ?
-          <View>
+          <View style={{flexDirection:'row'}}>
           <Button icon = "delete"
           mode = "contained" onPress={() => deletedData(data)} style = {{marginTop:30}}>Delete</Button>
           <Button icon = "Edit"
@@ -148,25 +171,15 @@ function Postdetail(props) {
           </View>
           : null}
         </View>
-
+        <View style={{borderTopWidth: 1, borderBottomWidth:1}}>
+        <Text style={{fontSize:25,  
+          borderColor: 'black'}}>
+      {data.numberofcomments} Replies
+    </Text>
     </View>
-    <View style = {styles.commentStyle}>
-      <TextInput 
-        style={styles.input}
-        onChangeText={(text) => {
-          changeText(text)
-        }}
-        value={text}
-        placeholder="Enter comment here"
-      />
-      <Button icon = "comment" 
-          style = {styles.inputStyle}
-          mode = "contained" 
-          onPress={() => addComment()}
-           >Comment</Button>
-    </View>
-    <SafeAreaView style={{flex: 1}}>
-    <View style={styles.flatListWrapper}>
+       <View style={styles.flatListWrapper}>
+       
+      <Card>
       <FlatList
       data = {comment}
       renderItem={({item})=>{
@@ -176,47 +189,101 @@ function Postdetail(props) {
       style={{flex:1,minHeight:400}}
       
       />
-    </View>
-    </SafeAreaView>
-   </View>
-      
+      </Card>
+      </View>
+      <Card>
+       <View style = {styles.commentStyle}>
+   
+      <TextInput 
+        style={styles.input}
+        onChangeText={(text) => {
+          changeText(text)
+        }}
+        value={text}
+        placeholder="Enter comment here"
+        multiline
+        numberOfLines={4}
+        maxLength={140}
+      />
+      <Button icon = "comment" 
+          style = {styles.inputStyle}
+          mode = "contained" 
+          onPress={() => addComment()}
+           >Comment</Button>
      
-    )
-}  
+    </View>
+    </Card>
+        </View>
+        <View style = {styles.commentStyle}>
+    
+           
+    </View>
+ 
+    </KeyboardAvoidingView>
+    
+  );
+};
 
-const styles = StyleSheet.create({ 
-
-    detailStyle: {
-        margin:10,
-        padding:10,
-
-    },
-    flatListWrapper: {
-      flex: 1,
-      flexGrow: 1
-    },
-    input: {
-      height: 40,
-      margin: 12,
-      borderWidth: 1,
-      padding: 10,
-      flex:3
-    },
-  commentStyle:{
-    flexDirection:"row"
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+ 
   },
-  inputStyle:{
+  inner: {
+    padding: 2,
+    flex: 1,
+    justifyContent: 'space-around',
+  },
+  header: {
+    fontSize: 36,
+    marginBottom: 48,
+  },
+  textInput: {
     height: 40,
-    marginTop:12,
-    flex:1
+    borderColor: '#000000',
+    borderBottomWidth: 1,
+    marginBottom: 36,
+    borderWidth: 1,
+  margin: 12,
+  borderWidth: 1,
+  padding: 10,
+  flex:3,
+  marginBottom:50
   },
-  cardStyle:{
+  btnContainer: {
+    backgroundColor: 'white',
+    marginTop: 12,
+  },
+  detailStyle: {
     margin:10,
-    padding:10
-  }
+    padding:10,
 
-}) 
+},
+flatListWrapper: {
+  flex: 1,
+  flexGrow: 1,
+  marginBottom:30,
+},
+input: {
+  height: 40,
+  margin: 12,
+  borderWidth: 1,
+  padding: 10,
+  flex:3,
+  marginBottom:86
+},
+commentStyle:{
+flexDirection:"row"
+},
+inputStyle:{
+height: 40,
+marginTop:12,
+flex:1
+},
+cardStyle:{
+margin:10,
+padding:10
+}
+});
 
-
-
-export default Postdetail
+export default Postdetails;

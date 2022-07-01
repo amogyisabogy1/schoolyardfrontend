@@ -1,16 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput,Alert, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, TextInput,Alert, ImageBackground, Image } from 'react-native';
 import Home from "./Screens/Home";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import New from "./Screens/New";
 import { Button} from 'react-native-paper';
 import Bio from './Screens/Bio';
 import Postdetail from './Screens/Postdetails';
+import Age from './Screens/Age';
 import Commentdetail from './Screens/commentdetail';
 import Comment from './Screens/comment';
 import SelectSchool from './Screens/SelectSchool';
 import SeeProfile from './Screens/Seeprofile';
+import Report from './Screens/Report';
 import Edit from './Screens/Edit'; 
-import Seeprofile from './Screens/Seeprofile';
 import VerifySchool from './Screens/VerifySchools';
 import GroupDetails from './Screens/GroupDetails';
 import Newgrouppost from './Screens/Newgrouppost';
@@ -31,6 +34,7 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 
 export const AuthContext = React.createContext();
+
 
 const Tab = createBottomTabNavigator();
 const localimage = require("./assets/schoolyardbg.png")
@@ -54,10 +58,10 @@ function Register({route}) {
   console.log(email)
   console.log(email)  
   const school = route.params.school
+  const birth = route.params.birth
   console.log(school)
   console.log(school) 
   length = school.length
-  const schools1 = school.slice(2, length);
  
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -71,9 +75,9 @@ function Register({route}) {
       Alert.alert('password is required');
     } 
     else{
-      signUp({ username, password, email, school})
+      signUp({ username, password, email, school, birth})
     }
-  }
+  } 
 
 
   return (
@@ -86,7 +90,7 @@ function Register({route}) {
         onChangeText={setUsername}
         placeholderTextColor = "#D50000"
         style={{    
-          marginTop: 10,
+          marginTop: 90,
           height: 40,
           margin: 12,
           borderWidth: 1,
@@ -259,7 +263,7 @@ export default function App({ navigation }) {
           headers:{ 
             'Content-Type':"application/json"
           },
-          body: JSON.stringify({'username':data.username,'password':data.password,'email':data.email, "school": data.school})
+          body: JSON.stringify({'username':data.username,'password':data.password,'email':data.email, "school": data.school, "birth": data.birth})
           
         }).then(response => response.json());
       }
@@ -335,25 +339,75 @@ function getHeaderTitle(route) {
     case 'Home1':
       return 'Home';
     case 'Groups':
-      return 'Group';
+      return 'Group';  
     
-  }
+  } 
 }
 function Home1() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Home1" component={Home}   options={{...headerstyles,title:"Home"}}/>
-      <Tab.Screen name="Groups" component={Group}  options={{...headerstyles,title:"groups "}}  />
-      <Tab.Screen name="Vent" component={Vent}  options={{...headerstyles,title:"Vent "}}  />
+      <Tab.Screen name="Home1" component={Home}   options={(route)=>({...headerstyles,title:" Home",  tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Home') {
+              iconName = focused
+                ? 'ios-information-circle'
+                : 'ios-information-circle-outline';
+            } else if (route.name === 'Groups') {
+              iconName = focused ? 'ios-list-box' : 'ios-list';
+            }
+
+            // You can return any component that you like here!
+            return <Ionicons name="home" size={30} color={color} />;
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray',
+        })
+        }/>
+      <Tab.Screen name="Groups" component={Group}   options={(route)=>({...headerstyles,title:"groups ", tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Groups') {
+              iconName = focused
+                ? 'ios-information-circle'
+                : 'ios-information-circle-outline';
+            } else if (route.name === 'Vent') {
+              iconName = focused ? 'ios-list-box' : 'ios-list';
+            }
+
+            // You can return any component that you like here!
+            return <Icon name="group" size={30} color={color} />;
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray',
+        })}  />
+       <Tab.Screen name="Vent" component={Vent}  options= {(route)=>({...headerstyles,title:"Vent ",tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Home') {
+              iconName = focused
+                ? 'ios-information-circle'
+                : 'ios-information-circle-outline';
+            } else if (route.name === 'Groups') {
+              iconName = focused ? 'ios-list-box' : 'ios-list';
+            }
+
+            // You can return any component that you like here!
+            return <Ionicons name="chatbubble-ellipses-outline" size={30} color={color} />;
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray',
+        })}  />
     </Tab.Navigator>
   );
 }
+
+
 
 function MyStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Prof" options={{headerShown:false}} component={Profile} />
-      <Stack.Screen name="SeeProf" options={{headerShown:false}} component={SeeProfile} />
       <Stack.Screen name="commentdetail" component={Commentdetail} />
     </Stack.Navigator>
   );
@@ -369,9 +423,11 @@ function MyStack() {
          {state.accesstoken == null ? (
           // No token found, user isn't signed in
           <React.Fragment>
-          
+           
           <Stack.Screen name="VerifySchool" component = {VerifySchool}
           options = {{...headerstyles,title:"Verify school", headerShown:false}} /> 
+         <Stack.Screen name="Age" component = {Age}
+          options = {{...headerstyles,title:"Age"}} />  
           <Stack.Screen name="SignInScreen" component = {SignInScreen}
           options = {{...headerstyles,title:"Sign in"}} /> 
           <Stack.Screen name="SelectSchool" component = {SelectSchool}
@@ -390,7 +446,9 @@ function MyStack() {
           options = {{...headerstyles,title:"Edit post"}} /> 
           <Stack.Screen name="ProfileSettings" component = {Bio}
           options = {{...headerstyles,title:"Profile Settings"}} /> 
-          <Stack.Screen name="Seeprofile" component = {Seeprofile}
+          <Stack.Screen name="report" component = {Report}
+          options = {{...headerstyles,title:"Report Post"}}/> 
+          <Stack.Screen name="Seeprofile" component = {SeeProfile}
           options = {{...headerstyles,title:"Profile"}} /> 
           <Stack.Screen name="commentdetail" component = {Commentdetail} options = {{...headerstyles,title:"Comment detail"}} /> 
           <Stack.Screen name="new" component = {New}

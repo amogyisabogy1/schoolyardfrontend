@@ -1,9 +1,8 @@
 import react from 'react';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
 import {useState, useEffect, useContext} from 'react';
-import { StyleSheet, Text, View, Button, FlatList, Alert, Modal, Pressable, TouchableOpacity, ImageBackground, TextInput, Image} from 'react-native';
+import { StyleSheet, Text, View, Button, FlatList, Alert, Modal, Pressable, TouchableOpacity, ImageBackground, TextInput} from 'react-native';
 import {Card, Title, FAB} from "react-native-paper"; 
 import postdetails from './Postdetails';
 import * as SecureStore from 'expo-secure-store';
@@ -11,12 +10,12 @@ import  {AuthContext}  from '../App'
 import { useNavigation } from '@react-navigation/native';
 import { MaterialHeaderButtons } from './MyHeaderbutton';
 import { Item } from 'react-navigation-header-buttons';
-import { useActionSheet } from '@expo/react-native-action-sheet';
+import { useIsFocused } from '@react-navigation/native'
 
 
 
 function Home({props, navigation}) {
-
+    const isFocused = useIsFocused()
     const [modalVisible, setModalVisible] = useState(false);
     const [text, onChangeText] = React.useState("");
     const [data,setData] = useState("")
@@ -24,79 +23,13 @@ function Home({props, navigation}) {
     const [{signUp}, state] = React.useContext(AuthContext);
     const localimage = require("../assets/schoolyardbg.png")
 
-    const { showActionSheetWithOptions } = useActionSheet();
-    const onPress = (id) =>{
-    console.log(id)
-
-    showActionSheetWithOptions(
-      {
-        options: ["Cancel","Why are you reporting this post? Select the reason below",'Harrasment', 'Bullying', 'Threatening', 'Sexual Content', 'Hate Speech', 'Other',],
-        cancelButtonIndex: 0,
-        userInterfaceStyle: 'dark',
-      },
-      buttonIndex => {
-        if (buttonIndex === 0) {
-          // cancel action
-        } else if (buttonIndex === 1) {
-          fetch("http:/192.168.86.141/reportpost/",{
-            method:"POST",
-            headers : {   
-                "Content-Type":"application/json"
-            },  
-            body: JSON.stringify({ id:id, type:"Harrasment"})
-        })
-          
-        } else if (buttonIndex === 2) {
-          fetch("http:/192.168.86.141/reportpost/",{
-            method:"POST",
-            headers : {   
-                "Content-Type":"application/json"
-            },  
-            body: JSON.stringify({ id:id, type:"Bullying"})
-        })
-        }else if (buttonIndex === 3) {
-          fetch("http:/192.168.86.141/reportpost/",{
-            method:"POST",
-            headers : {   
-                "Content-Type":"application/json"
-            },  
-            body: JSON.stringify({ id:id, type:"Threatening"})
-        })
-        }else if (buttonIndex === 4) {
-          fetch("http:/192.168.86.141/reportpost/",{
-            method:"POST",
-            headers : {   
-                "Content-Type":"application/json"
-            },  
-            body: JSON.stringify({ id:id, type:"Sexual Content"})
-        })
-        }else if (buttonIndex === 5) {
-          fetch("http:/192.168.86.141/reportpost/",{
-            method:"POST",
-            headers : {   
-                "Content-Type":"application/json"
-            },  
-            body: JSON.stringify({ id:id, type:"Hate Speech"})
-        })
-        }else if (buttonIndex === 6) {
-          fetch("http:/192.168.86.141/reportpost/",{
-            method:"POST",
-            headers : {   
-                "Content-Type":"application/json"
-            },  
-            body: JSON.stringify({ id:id, type:"Other"})
-        })
-        }
-      }
-    );
-    }
-
-
+    
     React.useLayoutEffect(() => {
       navigation.setOptions({
         // use MaterialHeaderButtons with consistent styling across your app
         headerRight: () => ( 
           <MaterialHeaderButtons>
+            <Item title="add" iconName="search" onPress={() => console.warn('add')} />
             <Item title="profile" onPress={() => navigation.navigate("Profile")} />
           </MaterialHeaderButtons>
         ),
@@ -105,30 +38,24 @@ function Home({props, navigation}) {
     const loadData = () => {
       
       console.log(state.school)
-      fetch(`http:/192.168.86.141/getposts`,{
+      fetch(`http:/192.168.86.141/vent/`,{
         method:"POST",
         headers : { 
-          "Content-Type":"application/json",
-      }, 
-      body: JSON.stringify({school:state.school})
+            "Content-Type":"application/json",
+        },     
+        body: JSON.stringify({school:state.school})
     })
     .then(resp => resp.json())
     .then(data =>{
-        console.log(data)
         setData(data)
-        setLoading(false)
      })
     
 
   }
     const insertData = () =>{
-        if(text==""){
-          Alert.alert("cannot create blank post!")
-        }else{
-        console.log(state)
         
         setModalVisible(!modalVisible)
-        fetch(`http:/192.168.86.141/newpost/`,{
+        fetch(`http:/192.168.86.141/addposttovent/`,{
             method:"POST",
             headers : { 
                 "Content-Type":"application/json",
@@ -137,61 +64,36 @@ function Home({props, navigation}) {
         })
         
          loadData()
-         onChangeText("")
-      }
      }
   
    
     const openItem = (data) => {
-        navigation.navigate("detail", {data:data, numberofcomments:data.numberofcomments})
+        navigation.navigate("detail", {data:data, anonymous:true})
     }
     useEffect(()=>{
-      console.log(state)
-      console.log(state.school)
-      if (state.school != null){
-       console.log(state.school)
-       console.log(state.school)
-       console.log(state.school)
-       fetch(`http:/192.168.86.141/getposts`,{
+
+      fetch(`http:/192.168.86.141/vent/`,{
         method:"POST",
         headers : { 
-          "Content-Type":"application/json",
-      }, 
-      body: JSON.stringify({school:state.school})
+            "Content-Type":"application/json",
+        },     
+        body: JSON.stringify({school:state.school})
     })
     .then(resp => resp.json())
     .then(data =>{
-        console.log(data)
         setData(data)
         setLoading(false)
      })
-        }
-     },[state.school,state.username]) 
-    const IconButton = ({ title, icon, item }) => (
-      <TouchableOpacity style={styles.button} onPress={()=>{onPress(item.id)}}>
-        <View justifyContent="row">
-         <Text>{title}</Text>
-         <Ionicons name={icon}  color="red"  />
-        </View>
-      </TouchableOpacity>
-    );
+     },[]) 
+    
     const renderdata = (item) =>{
-        console.log(item.id)
-        console.log(item.id)
         return (  
-        
         <Card style={styles.cardStyle}  onPress={()=> openItem(item)}>
-        <Text style = {{fontSize:8}} onPress={()=>{navigation.navigate("Seeprofile",{username:item.username})}}>{item.username}</Text>
         <Text style = {{fontSize:25}}>{item.title}</Text> 
-        <Text style = {{fontSize:8, justifyContent:'center', paddingLeft:85}}>{item.numberofcomments==1 ? <Text style = {{fontSize:12}}>{item.numberofcomments} comment</Text>  : <Text style = {{fontSize:12}}>{item.numberofcomments} comments</Text> }</Text> 
-        
-        <IconButton title="Report" item={item} icon="flag" />
         </Card>
-        
         )}
     return (
         <ImageBackground source={localimage} style={{flex:1}}>
-          
          <FlatList
              
             data = {data}
@@ -211,7 +113,6 @@ function Home({props, navigation}) {
             onPress={() => {setModalVisible(!modalVisible)}}
         />
   <Modal
-        style={{marginBottom:90}}
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -224,10 +125,9 @@ function Home({props, navigation}) {
           
           <View style={styles1.modalView}> 
           <Pressable onPress={() => setModalVisible(!modalVisible)}>
-  <Text style={{margin:5,padding:5, color:"red",marginRight:100}}>X</Text>
+  <Text style={{margin:5,padding:5}}>X</Text>
 </Pressable> 
               <TextInput
-              maxLength={500}
               multiline
               numberOfLines={4}
               placeholder="Enter your post"
@@ -265,6 +165,7 @@ const styles = StyleSheet.create({
     cardStyle: {
       margin: 10,
       padding: 10,
+      backgroundColor: "#ffe4c4"
       
     },  
     fab: {
@@ -279,7 +180,7 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      marginTop: -200
+      marginTop: 22
     },
     modalView: {
       margin: 20,
