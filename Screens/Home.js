@@ -9,10 +9,14 @@ import postdetails from './Postdetails';
 import * as SecureStore from 'expo-secure-store';
 import  {AuthContext}  from '../App'
 import { useNavigation } from '@react-navigation/native';
+import { FontAwesome5 } from '@expo/vector-icons'; 
 import { MaterialHeaderButtons } from './MyHeaderbutton';
 import { Item } from 'react-navigation-header-buttons';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-
+import RNPoll, { IChoice } from "react-native-poll";
+import { Entypo } from '@expo/vector-icons'; 
+import { AntDesign } from '@expo/vector-icons'; 
+import { Feather } from '@expo/vector-icons'; 
 
 
 function Home({props, navigation}) {
@@ -23,10 +27,62 @@ function Home({props, navigation}) {
     const [loading,setLoading] = useState(true)
     const [{signUp}, state] = React.useContext(AuthContext);
     const localimage = require("../assets/schoolyardbg.png")
-
+    const [polls1, setpolls1] = React.useState(false)
+    const [choice1, setchoice1] = React.useState("yes")
+    const [choice2, setchoice2] = React.useState("no")
+    const [ hi,sethi] = React.useState("hi")
     const { showActionSheetWithOptions } = useActionSheet();
+    const [allvotes, setallvotes] = React.useState()
+    //get all upvoted posts from the user, render data will check if its the current post which is being rendered, when the user upvotes it will update list causing rerender
+    
+    
+    const Upvote =(item) =>{
+      fetch("http:/192.168.86.141/Upvote/",{
+        method:"POST",
+        headers : {    
+            "Content-Type":"application/json"
+        },  
+        body: JSON.stringify({ id:item.id, school:state.school, username:state.username})
+    })
+    .then(resp => resp.json())
+    .then(data =>{ 
+      
+        setallvotes(data.vote)
+        console.log(allvotes)
+        console.log(allvotes) 
+        console.log(allvotes) 
+       
+        
+        
+     })  
+  
+    }
+    const Downvote =(item,userVoteValue) =>{
+      
+      fetch("http:/192.168.86.141/Downvote/",{
+        method:"POST",
+        headers : {    
+            "Content-Type":"application/json"
+        },  
+        body: JSON.stringify({ id:item.id, school:state.school, username:state.username})
+    })
+    .then(resp => resp.json())
+    .then(data =>{ 
+      
+        setallvotes(data.vote)
+        console.log(allvotes)
+        console.log(allvotes) 
+        console.log(allvotes) 
+       
+        
+        
+     })  
+  
+    }
+
+
     const onPress = (id) =>{
-    console.log(id)
+      
 
     showActionSheetWithOptions(
       {
@@ -104,7 +160,7 @@ function Home({props, navigation}) {
     }, [navigation]);
     const loadData = () => {
       
-      console.log(state.school)
+
       fetch(`http:/192.168.86.141/getposts`,{
         method:"POST",
         headers : { 
@@ -122,11 +178,11 @@ function Home({props, navigation}) {
 
   }
     const insertData = () =>{
+      if(polls1==false){
         if(text==""){
           Alert.alert("cannot create blank post!")
         }else{
-        console.log(state)
-        
+       
         setModalVisible(!modalVisible)
         fetch(`http:/192.168.86.141/newpost/`,{
             method:"POST",
@@ -138,20 +194,40 @@ function Home({props, navigation}) {
         
          loadData()
          onChangeText("")
+      }}else{
+        if(text==""){
+          Alert.alert("cannot create blank post!")
+        }else{
+        
+        
+       
+          fetch(`http:/192.168.86.141/createchoice/`,{
+            method:"POST",
+            headers : { 
+                "Content-Type":"application/json",
+            },     
+            body: JSON.stringify({title:text, username:state.username, school:state.school, choice1: choice1, choice2:choice2 })
+    
+    
+          })
+          setModalVisible(!modalVisible)   
+          loadData()
+          onChangeText("")
       }
-     }
+
+        
+      }
+    
+    }
   
    
-    const openItem = (data) => {
+   const openItem = (data) => {
         navigation.navigate("detail", {data:data, numberofcomments:data.numberofcomments})
     }
     useEffect(()=>{
-      console.log(state)
-      console.log(state.school)
+     
       if (state.school != null){
-       console.log(state.school)
-       console.log(state.school)
-       console.log(state.school)
+     
        fetch(`http:/192.168.86.141/getposts`,{
         method:"POST",
         headers : { 
@@ -161,31 +237,140 @@ function Home({props, navigation}) {
     })
     .then(resp => resp.json())
     .then(data =>{
-        console.log(data)
+  
         setData(data)
         setLoading(false)
      })
-        }
+     fetch(`http:/192.168.86.141/UserVotes/`,{
+      method:"POST",
+      headers : { 
+        "Content-Type":"application/json",
+    }, 
+    body: JSON.stringify({school:state.school, username:state.username})
+  })
+  .then(resp => resp.json())
+  .then(data =>{ 
+
+      setallvotes(data[0].vote)
+      setLoading(false)
+   })  
+ 
+        } 
      },[state.school,state.username]) 
+ 
+//<Text>{title}</Text>
+  
+const IconButton1 = ({ item }) => (
+  <TouchableOpacity style={{paddingLeft:100, }} onPress={()=>{onPress(item.id)}}>
+    <View flexDirection="row">
+    <Feather name="message-square" size={24} color="black" /> 
+    <Text style={{marginTop:2, marginLeft:5}}>{item.numberofcomments==1 ? <Text style = {{fontSize:12}}>{item.numberofcomments} </Text>  : <Text style = {{fontSize:12}}>{item.numberofcomments} </Text> }</Text> 
+     
+    
+    </View>
+  </TouchableOpacity>
+);
+
+
     const IconButton = ({ title, icon, item }) => (
-      <TouchableOpacity style={styles.button} onPress={()=>{onPress(item.id)}}>
+      <TouchableOpacity style={{paddingLeft:100}} onPress={()=>{onPress(item.id)}}>
         <View justifyContent="row">
-         <Text>{title}</Text>
+         
          <Ionicons name={icon}  color="red"  />
         </View>
       </TouchableOpacity>
     );
     const renderdata = (item) =>{
+        
+        
+        
+   
+        var choices = item.choice
+        var totalVotes = choices.reduce((acc, item) => acc + item.votes, 0);
+        console.log(totalVotes)
+        console.log(totalVotes)
+        const findUserName = state.username
+     
+        console.log(allvotes)
+        console.log("hi")
+        
+        var number = item.id
+        var itemstr = number.toString() 
+        const items = allvotes?.filter(res => res?.postid == item.id)
+        var userVoteValue = items?.reduce((acc, item) => item?.type, 0);
+        console.log("bruhtahi")
         console.log(item.id)
-        console.log(item.id)
+        console.log(userVoteValue)
+        console.log(userVoteValue)
+        console.log(userVoteValue)
+        
+                       
+
         return (  
         
         <Card style={styles.cardStyle}  onPress={()=> openItem(item)}>
+        
+      
         <Text style = {{fontSize:8}} onPress={()=>{navigation.navigate("Seeprofile",{username:item.username})}}>{item.username}</Text>
         <Text style = {{fontSize:25}}>{item.title}</Text> 
-        <Text style = {{fontSize:8, justifyContent:'center', paddingLeft:85}}>{item.numberofcomments==1 ? <Text style = {{fontSize:12}}>{item.numberofcomments} comment</Text>  : <Text style = {{fontSize:12}}>{item.numberofcomments} comments</Text> }</Text> 
+      <View style={{flexDirection:'row'}}>
+      <AntDesign onPress={()=>{
+      item.score = item.score + 1
+       Upvote(item, userVoteValue)
+  
+ 
+  
+  
+  
+  }} name={userVoteValue==1?"upcircle":"upcircleo"} size={24} color="black" />
         
-        <IconButton title="Report" item={item} icon="flag" />
+     <Text>{item.score}</Text>
+   
+     <AntDesign onPress={()=>{ 
+      
+      item.score = item.score - 1
+      Downvote(item, userVoteValue)
+  
+       
+
+   
+  }} name={userVoteValue==-1?"downcircle":"downcircleo"} size={24} color="black" />
+     
+        <IconButton1 item={item}  />
+        <IconButton  style={{paddingLeft:30}}title="Report" item={item} icon="flag" />
+   </View>
+        <RNPoll
+  totalVotes={totalVotes}
+
+  choices={item.choice}
+  onChoicePress={(selectedChoice: IChoice) =>{
+    fetch("http:/192.168.86.141/vote/",{
+      method:"POST",
+      headers : {   
+          "Content-Type":"application/json"
+      },  
+      body: JSON.stringify({ choiceid:selectedChoice.id, school:state.school, username:state.username, postid:item.id})
+  })
+  .then(()=>{
+    const findUserName = selectedChoice.id
+    totalVotes = 0
+    
+
+    for (const item of item?.choice) {
+      console.log(totalVotes)
+      
+      if (item.id === findUserName) {
+          item.votes = item.votes + 1;
+      }
+      totalVotes = totalVotes + item.votes
+    }
+    
+
+  })
+  sethi(totalVotes)
+  }
+  } 
+/>
         </Card>
         
         )}
@@ -210,6 +395,7 @@ function Home({props, navigation}) {
             theme = {{colors:{accent:"blue"}}}
             onPress={() => {setModalVisible(!modalVisible)}}
         />
+    
   <Modal
         style={{marginBottom:90}}
         animationType="slide"
@@ -240,13 +426,47 @@ function Home({props, navigation}) {
         onChangeText={onChangeText}
         value={text}
       />  
-          
+      {polls1==false? <Text></Text>:
+      <View style={{borderRadius:1, borderWidth:1}}>
+       <TextInput
+       maxLength={500}
+       placeholder="Choice one"
+       placeholderTextColor = "black"
+       onChangeText={setchoice1}
+       style={{    
+        width:200,
+         height: 50, 
+   margin: 12,
+   borderWidth: 1,
+   padding: 10,
+   borderColor:"black", 
+   borderRadius:10}}
+     />
+     <TextInput
+       maxLength={500}
+       placeholder="Choice two"
+       placeholderTextColor = "black"
+       onChangeText={setchoice2}
+       style={{    
+         height: 50, 
+   margin: 12,
+   borderWidth: 1,
+   padding: 10,
+   borderColor:"black", 
+   borderRadius:10}}
+     />
+     <Text style={{marginLeft:70, color:"red"}}onPress={()=>{setpolls1(false)}}>Remove Poll</Text>
+  </View>}
+          <View style={{flexDirection:"row"}}>
+         
+            <FontAwesome5 name="poll-h" size={24} color="black" onPress={() => { setpolls1(true) }} style={{height:40,width:40}}/>
               <Pressable
               style={[styles1.button, styles1.buttonClose]}
               onPress={() => { insertData() }}
             >
               <Text style={styles1.textStyle}>  Post</Text>
             </Pressable> 
+            </View>
             
           </View>
 
@@ -265,7 +485,8 @@ const styles = StyleSheet.create({
     cardStyle: {
       margin: 10,
       padding: 10,
-      
+      borderRadius:10,
+      borderWidth:1,
     },  
     fab: {
         position:"absolute",

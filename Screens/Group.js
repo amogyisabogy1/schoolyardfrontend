@@ -91,15 +91,18 @@ function Group() {
          
         return (  
         <Card style={styles.cardStyle}>
+          <View style={{flexDirection:'row', margin:15}}>
         
-        <Text style = {{fontSize:25}}>{item.name}</Text> 
+        <Text style = {{fontSize:25, marginRight:75}}>{item.name}</Text> 
         <Button
         title="Join group"
+       
         onPress={()=>{
            addusertogroup(item.name)
            navigation.navigate('Groupdetails',{'name':item.name})
         }}
         />
+        </View>
         </Card>
         )}
     if(data){
@@ -286,6 +289,7 @@ const styles = StyleSheet.create({
     cardStyle: {
       margin: 10,
       padding: 10,
+      borderRadius:25
       
     },  
     fab: {

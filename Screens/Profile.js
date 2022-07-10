@@ -202,7 +202,7 @@ function Profile(props) {
       <View style={{flex:1}}>
         <View style = {{flexDirection:'row', marginTop:30, marginLeft:20, marginRight:20}}>
          
-        <Text style={{textAlign: 'center', fontSize:27, flex:2}}>  {state.username}</Text>
+        <Text style={{textAlign: 'center', fontSize:27, flex:2, marginBottom:50}}>  {state.username}</Text>
         <Text style={{ marginTop:10, fontSize:12, flex:1,}}> {posts.length} posts</Text>
         <Text style={{ marginTop:10, fontSize:12, flex:1,}}> {comment.length} comments</Text>
         

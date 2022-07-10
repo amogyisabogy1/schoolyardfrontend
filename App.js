@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput,Alert, ImageBackground, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput,Alert, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import Home from "./Screens/Home";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import New from "./Screens/New";
+import New from "./Screens/New"; 
 import { Button} from 'react-native-paper';
 import Bio from './Screens/Bio';
 import Postdetail from './Screens/Postdetails';
@@ -37,7 +37,7 @@ export const AuthContext = React.createContext();
 
 
 const Tab = createBottomTabNavigator();
-const localimage = require("./assets/schoolyardbg.png")
+const localimage = require("./assets/Verify.png")
 
 function SplashScreen() {
   return (
@@ -61,8 +61,8 @@ function Register({route}) {
   const birth = route.params.birth
   console.log(school)
   console.log(school) 
-  length = school.length
- 
+  length = school.length 
+  const localimage1 = require("./assets/schoolyard.png") 
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -81,35 +81,53 @@ function Register({route}) {
 
 
   return (
-    <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
-    
+    <ImageBackground  source = {localimage}  style={{ backgroundColor: '#FFFFFF', height:'100%'}} >
+      <Image style={{marginTop:50,marginLeft:50}}source={localimage1}/>
       <TextInput
         maxLength={500}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
-        placeholderTextColor = "#D50000"
+        placeholderTextColor = "black"
         style={{    
-          marginTop: 90,
-          height: 40,
-          margin: 12,
-          borderWidth: 1,
-          padding: 10,}}
+          height: 50,   
+    margin: 12,
+    borderWidth: 1,
+    
+    padding: 10,
+    borderColor:"black", 
+    borderRadius:10}}
       />
       <TextInput
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
-        placeholderTextColor = "#D50000"
+        placeholderTextColor = "black" 
+        
         secureTextEntry
         style={{  
-          marginTop: 1,  
-          height: 40,
-          margin: 12,
-          borderWidth: 1,
-          padding: 10,}} 
+          
+          height: 50,
+      margin: 12,
+      borderWidth: 1,
+      padding: 10,
+      borderColor:"black",  
+      borderRadius:10}} 
       />
-      <Button style = {{marginTop:200}}onPress={() => {SignUp1234()}} mode = "contained"> Register </Button>
+
+
+
+      <TouchableOpacity 
+        style={{alignItems: "center",
+    backgroundColor: "#5780FA",
+    borderRadius:10,
+    padding: 10,
+    height:52, margin:10}}
+        onPress={()=> {SignUp1234()}}
+      >
+        <Text style={{marginTop:8, color:"white"}}>Sign Up</Text>
+      </TouchableOpacity>
+
       </ImageBackground> 
   );
 }
@@ -344,9 +362,10 @@ function getHeaderTitle(route) {
   } 
 }
 function Home1() {
+  
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Home1" component={Home}   options={(route)=>({...headerstyles,title:" Home",  tabBarIcon: ({ focused, color, size }) => {
+      <Tab.Screen name="Home1" component={Home}   options={(route)=>({...headerstyles,title:state.school?state.school:"Home", color:"white",  tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
             if (route.name === 'Home') {
@@ -360,8 +379,11 @@ function Home1() {
             // You can return any component that you like here!
             return <Ionicons name="home" size={30} color={color} />;
           },
-          tabBarActiveTintColor: 'tomato',
+          tabBarActiveTintColor: 'blue',
           tabBarInactiveTintColor: 'gray',
+          headerTitleStyle: {
+            color: 'white'
+          }
         })
         }/>
       <Tab.Screen name="Groups" component={Group}   options={(route)=>({...headerstyles,title:"groups ", tabBarIcon: ({ focused, color, size }) => {
@@ -378,7 +400,7 @@ function Home1() {
             // You can return any component that you like here!
             return <Icon name="group" size={30} color={color} />;
           },
-          tabBarActiveTintColor: 'tomato',
+          tabBarActiveTintColor: 'blue',
           tabBarInactiveTintColor: 'gray',
         })}  />
        <Tab.Screen name="Vent" component={Vent}  options= {(route)=>({...headerstyles,title:"Vent ",tabBarIcon: ({ focused, color, size }) => {
@@ -395,7 +417,7 @@ function Home1() {
             // You can return any component that you like here!
             return <Ionicons name="chatbubble-ellipses-outline" size={30} color={color} />;
           },
-          tabBarActiveTintColor: 'tomato',
+          tabBarActiveTintColor: 'blue',
           tabBarInactiveTintColor: 'gray',
         })}  />
     </Tab.Navigator>
@@ -479,59 +501,86 @@ function MyStack() {
   
   const headerstyles = StyleSheet.create({
     headerStyle: {
-      backgroundColor: '#8a2be2',
+      
+      backgroundColor: 'blue',
     },
+    
     container: {
       flex: 1, 
       backgroundColor: '#eddfdf', 
     },
   });
   function SignInScreen() {
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [{signIn}, state] = React.useContext(AuthContext);
-  
-    const [usernamestate, setusernamestate] = React.useState(username)
-    function signInlol(){
-        if(username == ''){
-          Alert.alert('Username is required');
-        }
-        else if (password== ''){
-          Alert.alert('password is required');
-        } 
-        else{
-          signIn({ username, password})
-        }
+    
+  const localimage1 = require("./assets/schoolyard.png") 
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const [{signIn}, state] = React.useContext(AuthContext);
+  function SignUp1234(){ 
+    if(username == ''){
+      Alert.alert('Username is required');
     }
-    
-    
-    return (
-      <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
-      
-        <TextInput 
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-          style={{    
-            marginTop: 10,
-            height: 40,
-            margin: 12,
-            borderWidth: 1, 
-            padding: 10,}}
-        />
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={{   
-            marginTop: 1,  
-            height: 40,
-            margin: 12,
-            borderWidth: 1,
-            padding: 10,}} 
-        />
-        <Button style = {{marginTop:20}}onPress={() => signInlol()} mode = "contained"> Sign In </Button>
-        </ImageBackground> 
-    );
+    else if (password== ''){
+      Alert.alert('password is required');
+    } 
+    else{
+      signIn({ username, password})
+    }
   } 
+
+
+  return (
+    <ImageBackground  source = {localimage}  style={{ backgroundColor: '#FFFFFF', height:'100%'}} >
+      <Image style={{marginTop:50,marginLeft:50}}source={localimage1}/>
+      <TextInput
+        maxLength={500}
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+        placeholderTextColor = "black"
+        style={{    
+          height: 50,   
+    margin: 12,
+    borderWidth: 1,
+    
+    padding: 10,
+    borderColor:"black", 
+    borderRadius:10}}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        placeholderTextColor = "black" 
+        
+        secureTextEntry
+        style={{  
+          
+          height: 50,
+      margin: 12,
+      borderWidth: 1,
+      padding: 10,
+      borderColor:"black",  
+      borderRadius:10}} 
+      />
+
+
+
+      <TouchableOpacity 
+        style={{alignItems: "center",
+    backgroundColor: "#5780FA",
+    borderRadius:10,
+    padding: 10,
+    height:52, margin:10}}
+        onPress={()=> {SignUp1234()}}
+      >
+        <Text style={{marginTop:8, color:"white"}}>Log In</Text>
+      </TouchableOpacity>
+
+      </ImageBackground> 
+  );
+}
+
+    
+  

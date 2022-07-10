@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, Text, Image, ImageBackground } from 'react-native';
+import { StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -14,7 +14,7 @@ export default function App() {
   const [userInfo, setUserInfo] = React.useState();
   const [message, setMessage] = React.useState();
   const [school, setSchool] = React.useState();
-  const localimage = require("../assets/schoolyardbg1.png")
+  const localimage = require("../assets/Verify.png")
   const localimage1 = require("../assets/schoolyard.png")
 
   const navigation = useNavigation();
@@ -88,18 +88,32 @@ function navigateSchool(schools, email1){
   return (
     <ImageBackground  source = {localimage} style={{ backgroundColor: '#FFFFFF', height:'100%'}}>
       
-    <Image style={{marginTop:50,marginLeft:50}}source={localimage1}/>
-      <Text style={{marginLeft:70, marginTop:195}}>Sign in with your school email below ↓</Text>
-      <Button
-                    mode = "contained"
-                    onPress={()=> {promptAsync({ showInRecents: true})}}
-                    style={{margin:50, marginBottom:10}}>Find your school
-                </Button>
-      <Button
-                    mode = "contained"
-                    onPress={()=> {navigation.navigate("SignInScreen")}}
-                    style={{margin:30 ,marginTop:5}}>Already have an account?Log in 
-                </Button>
+    <Image style={{marginTop:160,marginLeft:50}}source={localimage1}/>
+      <Text style={{marginLeft:70, marginTop:35, fontWeight: 'bold' }}>Sign in with your school email below ↓</Text>
+     
+                <TouchableOpacity 
+        style={{alignItems: "center",
+    backgroundColor: "#5780FA",
+    borderRadius:10,
+    padding: 10,
+    height:52, margin:10}}
+        onPress={()=> {promptAsync({ showInRecents: true})}}
+      >
+        <Text style={{marginTop:8, color:"white"}}>Find your School</Text>
+      </TouchableOpacity>
+
+
+      <TouchableOpacity 
+        style={{alignItems: "center",
+    backgroundColor: "#5780FA",
+    borderRadius:10,
+    padding: 10,
+    height:52, 
+  margin:10}}
+        onPress={()=> {navigation.navigate("SignInScreen")}}
+      >
+        <Text style={{marginTop:8, color:"white"}}>Already have an account? Log In</Text>
+      </TouchableOpacity>
      
       <StatusBar style="auto" />
     </ImageBackground>

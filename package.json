@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.13.0",
+    "@freakycoder/react-native-bounceable": "^0.2.5",
     "@react-native-community/datetimepicker": "6.1.2",
     "@react-native-picker/picker": "2.4.0",
     "@react-navigation/bottom-tabs": "^6.2.0",
@@ -37,6 +38,7 @@
     "react-native-keyboard-aware-view": "^0.0.14",
     "react-native-pager-view": "5.4.15",
     "react-native-paper": "^4.11.2",
+    "react-native-poll": "^0.1.2",
     "react-native-popup-menu": "^0.15.12",
     "react-native-reanimated": "~2.8.0",
     "react-native-redash": "^16.2.4",
