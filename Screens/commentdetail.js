@@ -55,7 +55,7 @@ function Commentdetail(props) {
 
    }
     const addComment = () =>{
-      fetch("http:/192.168.86.141/comment/",{
+      fetch("http:/192.168.29.189omment/",{
           method:"POST",
           headers : {   
               "Content-Type":"application/json"

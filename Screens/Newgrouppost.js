@@ -15,7 +15,7 @@ function Newgrouppost({navigation, route}) {
 
     
  const insertData = () =>{
-    fetch("http:/192.168.86.141/addposttogroup/",{
+    fetch("http:/192.168.29.189/addposttogroup/",{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",

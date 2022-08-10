@@ -25,7 +25,7 @@ function Group() {
     const [text, onChangeText] = React.useState("");
     function createGroup(){
         setModalVisible(!modalVisible) 
-        fetch(`http:/192.168.86.141/creategroup`,{
+        fetch(`http:/192.168.29.189/creategroup`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",
@@ -47,7 +47,7 @@ function Group() {
     }, [navigation]);
 
     function addusertogroup(name){
-        fetch(`http:/192.168.86.141/addusertogroup`,{
+        fetch(`http:/192.168.29.189/addusertogroup`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",
@@ -58,7 +58,7 @@ function Group() {
         console.log(name)
     }
     const loadData = ()=>{
-        fetch(`http:/192.168.86.141/getgroups`,{
+        fetch(`http:/192.168.29.189/getgroups`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",
@@ -73,7 +73,7 @@ function Group() {
         .catch(error => Alert.alert("error"))
     }
     useEffect(()=>{
-        fetch(`http:/192.168.86.141/getgroups`,{
+        fetch(`http:/192.168.29.189/getgroups`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",
@@ -93,10 +93,10 @@ function Group() {
         <Card style={styles.cardStyle}>
           <View style={{flexDirection:'row', margin:15}}>
         
-        <Text style = {{fontSize:25, marginRight:75}}>{item.name}</Text> 
+        <Text style = {{fontSize:25, marginRight:75, flex:2}}>{item.name}</Text> 
         <Button
         title="Join group"
-       
+        style={{flex:1}}
         onPress={()=>{
            addusertogroup(item.name)
            navigation.navigate('Groupdetails',{'name':item.name})
@@ -182,7 +182,7 @@ function Group() {
 function AllGroup() {
     const [data,setData] = useState("")
     const loadData = ()=>{
-        fetch(`http:/192.168.86.141/groupsfromuser`,{
+        fetch(`http:/192.168.29.189/groupsfromuser`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",
@@ -197,7 +197,7 @@ function AllGroup() {
         .catch(error => Alert.alert("error"))
     }
     useEffect(()=>{
-        fetch(`http:/192.168.86.141/groupsfromuser`,{
+        fetch(`http:/192.168.29.189/groupsfromuser`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",

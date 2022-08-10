@@ -20,6 +20,9 @@ function Profile(props) {
   const isFocused = useIsFocused()
   const [modalVisible, setModalVisible] = useState(false);
   const [Join, setJoinDate] = useState("")
+  const [postcolor, setpostcolor] = useState("")
+  const [commentcolor, setcommentcolor] = useState("")
+  const [savedcolor, setsavedcolor] = useState("")
   const [text, onChangeText] = React.useState("");
   const [posts,setPosts] = useState("")
   const [loading,setLoading] = useState(true)
@@ -66,7 +69,7 @@ function Profile(props) {
   
   const loadData = () => {
     
-    fetch(`http:/192.168.86.141/profile/`,{
+    fetch(`http:/192.168.29.189/profile/`,{
       method:"POST",
           headers : { 
             "Content-Type":"application/json",
@@ -199,15 +202,19 @@ function Profile(props) {
         </Card>
         )}
   return (
-      <View style={{flex:1}}>
-        <View style = {{flexDirection:'row', marginTop:30, marginLeft:20, marginRight:20}}>
+      <View style={{flex:1}}> 
+        <View style={{flexDirection:"column"}}>
+        <Text style={{textAlign: 'center', fontSize:20, marginTop:65, color:"#332710"}}>  {state.username}</Text>
+
+        <View style = {{flexDirection:'row', marginTop:30, marginLeft:20, marginRight:20, alignItems: 'center',  flex: 1,
+    justifyContent: "center",}}>
          
-        <Text style={{textAlign: 'center', fontSize:27, flex:2, marginBottom:50}}>  {state.username}</Text>
         <Text style={{ marginTop:10, fontSize:12, flex:1,}}> {posts.length} posts</Text>
         <Text style={{ marginTop:10, fontSize:12, flex:1,}}> {comment.length} comments</Text>
         
         
         </View>
+      </View>
         <View>
         <Text>{Join}</Text>
         </View>
@@ -219,13 +226,19 @@ function Profile(props) {
         </View>
         <View style = {{flexDirection:'row'}}>
         <Button 
-                    style={{marginRight:4, marginTop:14, flex:3, marginLeft:5}}
+                    color={poststate ? "#332710":"#0080FF"}
+                    style={{ flex:3, margin: 10,
+                      padding: 10,
+                      borderRadius:25}}
                     icon = "pencil"
                     mode = "contained"
                     onPress={()=> setpoststate(true)}>Posts
         </Button>
         <Button
-                     style={{marginTop: 12 ,marginRight:4, flex:3}}
+                    color={commentstate ? "#332710":"#0080FF"}
+                     style={{flex:3,margin: 10,
+                      padding: 10,
+                      borderRadius:25}} 
                     icon = "pencil"
                     mode = "contained"
                     onPress={()=> {setpoststate(false)
@@ -233,7 +246,10 @@ function Profile(props) {
                                   setcommentstate(true)}}>Comments
         </Button>
         <Button
-                     style={{ marginTop:12, flex:3, marginRight:5}}
+                    color={savedstate ? "#332710":"#0080FF"}
+                     style={{ flex:3, margin: 10,
+                      padding: 10,
+                      borderRadius:25}}
                     icon = "pencil"
                     mode = "contained"
                     onPress={()=> {

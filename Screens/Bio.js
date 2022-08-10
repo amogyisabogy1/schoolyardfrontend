@@ -13,7 +13,7 @@ function Bio(props) {
   const [{signOut}, state] = React.useContext(AuthContext); 
   console.log(bioprop)
   function EditBio(){
-    fetch(`http:/192.168.86.141/bio/`,{
+    fetch(`http:/192.168.29.189/bio/`,{
       method:"POST",
       headers : { 
           "Content-Type":"application/json",

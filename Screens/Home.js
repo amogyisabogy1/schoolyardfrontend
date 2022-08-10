@@ -3,10 +3,11 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
 import {useState, useEffect, useContext} from 'react';
-import { StyleSheet, Text, View, Button, FlatList, Alert, Modal, Pressable, TouchableOpacity, ImageBackground, TextInput, Image} from 'react-native';
-import {Card, Title, FAB} from "react-native-paper"; 
+import { StyleSheet, Text, View, FlatList, Alert, Modal, Pressable, TouchableOpacity, ImageBackground, TextInput, Image} from 'react-native';
+import {Card, Title, FAB, Button} from "react-native-paper"; 
 import postdetails from './Postdetails';
 import * as SecureStore from 'expo-secure-store';
+import moment from 'moment';
 import  {AuthContext}  from '../App'
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons'; 
@@ -17,14 +18,17 @@ import RNPoll, { IChoice } from "react-native-poll";
 import { Entypo } from '@expo/vector-icons'; 
 import { AntDesign } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons'; 
+import { EvilIcons } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
-
-function Home({props, navigation}) {
-
+function Home({props, navigation, route}) {
+    const [newcolor, setnewcolor] = React.useState("#332710");
+    const [topcolor, settopcolor] = React.useState("#F1F1F1");
     const [modalVisible, setModalVisible] = useState(false);
     const [text, onChangeText] = React.useState("");
-    const [data,setData] = useState("")
+    const [data1,setData] = useState("")
     const [loading,setLoading] = useState(true)
+    const [type1,settype] = useState("")
     const [{signUp}, state] = React.useContext(AuthContext);
     const localimage = require("../assets/schoolyardbg.png")
     const [polls1, setpolls1] = React.useState(false)
@@ -33,11 +37,21 @@ function Home({props, navigation}) {
     const [ hi,sethi] = React.useState("hi")
     const { showActionSheetWithOptions } = useActionSheet();
     const [allvotes, setallvotes] = React.useState()
+    const [numba, setnumba] = React.useState("1")
     //get all upvoted posts from the user, render data will check if its the current post which is being rendered, when the user upvotes it will update list causing rerender
     
-    
+    async function getValueFor(key) {
+      let result = await SecureStore.getItemAsync(key);
+      if (result) {
+        alert("🔐 Here's your value 🔐 \n" + result);
+      } else {
+        alert('No values stored under that key.');
+      }
+    }
+    getValueFor("refreshtoken")
+  
     const Upvote =(item) =>{
-      fetch("http:/192.168.86.141/Upvote/",{
+      fetch("http:/192.168.29.189/Upvote/",{
         method:"POST",
         headers : {    
             "Content-Type":"application/json"
@@ -59,7 +73,7 @@ function Home({props, navigation}) {
     }
     const Downvote =(item,userVoteValue) =>{
       
-      fetch("http:/192.168.86.141/Downvote/",{
+      fetch("http:/192.168.29.189/Downvote/",{
         method:"POST",
         headers : {    
             "Content-Type":"application/json"
@@ -94,7 +108,7 @@ function Home({props, navigation}) {
         if (buttonIndex === 0) {
           // cancel action
         } else if (buttonIndex === 1) {
-          fetch("http:/192.168.86.141/reportpost/",{
+          fetch("http:/192.168.29.189/reportpost/",{
             method:"POST",
             headers : {   
                 "Content-Type":"application/json"
@@ -103,7 +117,7 @@ function Home({props, navigation}) {
         })
           
         } else if (buttonIndex === 2) {
-          fetch("http:/192.168.86.141/reportpost/",{
+          fetch("http:/192.168.29.189/reportpost/",{
             method:"POST",
             headers : {   
                 "Content-Type":"application/json"
@@ -111,7 +125,7 @@ function Home({props, navigation}) {
             body: JSON.stringify({ id:id, type:"Bullying"})
         })
         }else if (buttonIndex === 3) {
-          fetch("http:/192.168.86.141/reportpost/",{
+          fetch("http:/192.168.29.189/reportpost/",{
             method:"POST",
             headers : {   
                 "Content-Type":"application/json"
@@ -119,7 +133,7 @@ function Home({props, navigation}) {
             body: JSON.stringify({ id:id, type:"Threatening"})
         })
         }else if (buttonIndex === 4) {
-          fetch("http:/192.168.86.141/reportpost/",{
+          fetch("http:/192.168.29.189/reportpost/",{
             method:"POST",
             headers : {   
                 "Content-Type":"application/json"
@@ -127,7 +141,7 @@ function Home({props, navigation}) {
             body: JSON.stringify({ id:id, type:"Sexual Content"})
         })
         }else if (buttonIndex === 5) {
-          fetch("http:/192.168.86.141/reportpost/",{
+          fetch("http:/192.168.29.189/reportpost/",{
             method:"POST",
             headers : {   
                 "Content-Type":"application/json"
@@ -135,7 +149,7 @@ function Home({props, navigation}) {
             body: JSON.stringify({ id:id, type:"Hate Speech"})
         })
         }else if (buttonIndex === 6) {
-          fetch("http:/192.168.86.141/reportpost/",{
+          fetch("http:/192.168.29.189/reportpost/",{
             method:"POST",
             headers : {   
                 "Content-Type":"application/json"
@@ -153,23 +167,25 @@ function Home({props, navigation}) {
         // use MaterialHeaderButtons with consistent styling across your app
         headerRight: () => ( 
           <MaterialHeaderButtons>
-            <Item title="profile" onPress={() => navigation.navigate("Profile")} />
+            <EvilIcons name="user" onPress={() => navigation.navigate("Profile")} size={36} color="white" />
+            
           </MaterialHeaderButtons>
         ),
       });
     }, [navigation]);
     const loadData = () => {
+      setnumba(1)
       
-
-      fetch(`http:/192.168.86.141/getposts`,{
-        method:"POST",
+      fetch(`http:/192.168.29.189/getposts`,{
+        method:"POST", 
         headers : { 
           "Content-Type":"application/json",
       }, 
-      body: JSON.stringify({school:state.school})
+      body: JSON.stringify({school:state.school,pagenumber:1, type:type1})
     })
     .then(resp => resp.json())
     .then(data =>{
+        setnumba(1)
         console.log(data)
         setData(data)
         setLoading(false)
@@ -182,26 +198,33 @@ function Home({props, navigation}) {
         if(text==""){
           Alert.alert("cannot create blank post!")
         }else{
-       
+        setnumba(1)
         setModalVisible(!modalVisible)
-        fetch(`http:/192.168.86.141/newpost/`,{
+        fetch(`http:/192.168.29.189/newpost/`,{
             method:"POST",
             headers : { 
                 "Content-Type":"application/json",
             },     
             body: JSON.stringify({title:text, username:state.username, school:state.school})
         })
-        
-         loadData()
+        .then(resp => resp.json())
+        .then(data =>{
+            console.log(data)
+            setData(data)
+            setLoading(false)
+         })
          onChangeText("")
+        
+
+   
       }}else{
         if(text==""){
           Alert.alert("cannot create blank post!")
         }else{
         
         
-       
-          fetch(`http:/192.168.86.141/createchoice/`,{
+          setpolls1(false)
+          fetch(`http:/192.168.29.189/createchoice/`,{
             method:"POST",
             headers : { 
                 "Content-Type":"application/json",
@@ -211,7 +234,21 @@ function Home({props, navigation}) {
     
           })
           setModalVisible(!modalVisible)   
-          loadData()
+          
+      setnumba(1)
+      fetch(`http:/192.168.29.189/getposts`,{
+        method:"POST",
+        headers : { 
+          "Content-Type":"application/json",
+      }, 
+      body: JSON.stringify({school:state.school,pagenumber:numba,type:type1})
+    })
+    .then(resp => resp.json())
+    .then(data =>{
+        console.log(data)
+        setData(data)
+        setLoading(false)
+     })
           onChangeText("")
       }
 
@@ -220,6 +257,26 @@ function Home({props, navigation}) {
     
     }
   
+     const loadmoredata=()=>{
+      if (state.school != null){
+        var numbas = parseInt(numba) + 1
+        setnumba(numbas)
+        console.log("hihihih123")
+        console.log(numba)
+        fetch(`http:/192.168.29.189/getposts`,{
+         method:"POST",
+         headers : { 
+           "Content-Type":"application/json",
+       }, 
+       body: JSON.stringify({school:state.school, pagenumber:numbas, type:type1})
+     })
+     .then(resp => resp.json())
+     .then(data =>{
+        var cjar = data1.concat(data);
+         setData(cjar)
+         setLoading(false)
+      })
+    }}
    
    const openItem = (data) => {
         navigation.navigate("detail", {data:data, numberofcomments:data.numberofcomments})
@@ -227,13 +284,15 @@ function Home({props, navigation}) {
     useEffect(()=>{
      
       if (state.school != null){
+       setnumba(1)
+
      
-       fetch(`http:/192.168.86.141/getposts`,{
+       fetch(`http:/192.168.29.189/getposts`,{
         method:"POST",
         headers : { 
           "Content-Type":"application/json",
       }, 
-      body: JSON.stringify({school:state.school})
+      body: JSON.stringify({school:state.school, pagenumber:numba, type:type1})
     })
     .then(resp => resp.json())
     .then(data =>{
@@ -241,7 +300,7 @@ function Home({props, navigation}) {
         setData(data)
         setLoading(false)
      })
-     fetch(`http:/192.168.86.141/UserVotes/`,{
+     fetch(`http:/192.168.29.189/UserVotes/`,{
       method:"POST",
       headers : { 
         "Content-Type":"application/json",
@@ -259,13 +318,20 @@ function Home({props, navigation}) {
      },[state.school,state.username]) 
  
 //<Text>{title}</Text>
+const Top123 =()=>(
+  settype("Top")
+)
+
+const New123 =()=>(
+  settype("New")
+)
   
 const IconButton1 = ({ item }) => (
-  <TouchableOpacity style={{paddingLeft:100, }} onPress={()=>{onPress(item.id)}}>
+  <TouchableOpacity style={{paddingLeft:1, }} onPress={()=>{onPress(item.id)}}>
     <View flexDirection="row">
-    <Feather name="message-square" size={24} color="black" /> 
-    <Text style={{marginTop:2, marginLeft:5}}>{item.numberofcomments==1 ? <Text style = {{fontSize:12}}>{item.numberofcomments} </Text>  : <Text style = {{fontSize:12}}>{item.numberofcomments} </Text> }</Text> 
-     
+    <Feather name="message-square" size={26} color="black" style={{marginBottom:3}} /> 
+    <Text style={{marginLeft:0, marginRight:10, marginTop:3}}>{item.numberofcomments==1 ? <Text style = {{fontSize:12}}>{item.numberofcomments} </Text>  : <Text style = {{fontSize:12}}>{item.numberofcomments} </Text> }</Text> 
+      
     
     </View>
   </TouchableOpacity>
@@ -273,19 +339,24 @@ const IconButton1 = ({ item }) => (
 
 
     const IconButton = ({ title, icon, item }) => (
-      <TouchableOpacity style={{paddingLeft:100}} onPress={()=>{onPress(item.id)}}>
+      <TouchableOpacity style={{paddingLeft:220, marginRight:10}} onPress={()=>{onPress(item.id)}}>
         <View justifyContent="row">
          
-         <Ionicons name={icon}  color="red"  />
+         <Ionicons name={icon} size={24} color="red"  />
         </View>
       </TouchableOpacity>
     );
     const renderdata = (item) =>{
+      console.log("time")
+      console.log(moment.utc(item.ctime).local().startOf('seconds').fromNow())
+     
+      var posted = moment.utc(item.ctime).local().startOf('seconds').fromNow()
         
-        
-        
-   
+        var poll1234 = false
         var choices = item.choice
+        if(choices.length >= 1){
+         poll1234 = true
+        }
         var totalVotes = choices.reduce((acc, item) => acc + item.votes, 0);
         console.log(totalVotes)
         console.log(totalVotes)
@@ -311,40 +382,54 @@ const IconButton1 = ({ item }) => (
         <Card style={styles.cardStyle}  onPress={()=> openItem(item)}>
         
       
-        <Text style = {{fontSize:8}} onPress={()=>{navigation.navigate("Seeprofile",{username:item.username})}}>{item.username}</Text>
+        <Text style = {{fontSize:12}} onPress={()=>{navigation.navigate("Seeprofile",{username:item.username})}}>{item.username}</Text>
         <Text style = {{fontSize:25}}>{item.title}</Text> 
-      <View style={{flexDirection:'row'}}>
+      <View style={{flexDirection:'row', marginTop:12,marginBottom:2}}>
+      <IconButton1 item={item}  />
       <AntDesign onPress={()=>{
+      if(userVoteValue==-1){
       item.score = item.score + 1
        Upvote(item, userVoteValue)
+      }else if(userVoteValue==0){
+        item.score = item.score + 1
+       Upvote(item, userVoteValue)
+      }
   
  
   
-  
+   
   
   }} name={userVoteValue==1?"upcircle":"upcircleo"} size={24} color="black" />
         
-     <Text>{item.score}</Text>
+     <Text style={{marginTop:2}}>{item.score}</Text>
    
      <AntDesign onPress={()=>{ 
-      
-      item.score = item.score - 1
-      Downvote(item, userVoteValue)
+       if(userVoteValue==1){
+        item.score = item.score - 1
+         Downvote(item, userVoteValue)
+        }else if(userVoteValue==0){
+          item.score = item.score - 1
+         Downvote(item, userVoteValue)
+        }
   
        
 
    
   }} name={userVoteValue==-1?"downcircle":"downcircleo"} size={24} color="black" />
      
-        <IconButton1 item={item}  />
-        <IconButton  style={{paddingLeft:30}}title="Report" item={item} icon="flag" />
-   </View>
-        <RNPoll
+        
+        <IconButton  style={{paddingLeft:3, marginTop:1}} size={46} title="Report" item={item} icon="flag" />
+  
+   </View > 
+   <Text style={{marginBottom:10}}>{posted}</Text>
+   {poll1234?
+   <RNPoll
+        style={{marginBottom:10}}
   totalVotes={totalVotes}
 
   choices={item.choice}
   onChoicePress={(selectedChoice: IChoice) =>{
-    fetch("http:/192.168.86.141/vote/",{
+    fetch("http:/192.168.29.189/vote/",{
       method:"POST",
       headers : {   
           "Content-Type":"application/json"
@@ -365,27 +450,61 @@ const IconButton1 = ({ item }) => (
       totalVotes = totalVotes + item.votes
     }
     
-
   })
   sethi(totalVotes)
   }
   } 
-/>
+/>:null}
         </Card>
-        
+         
         )}
+
+      
     return (
-        <ImageBackground source={localimage} style={{flex:1}}>
+        <View style={{backgroundColor:"white"}}>
+<View style={{flexDirection:"row"}}>
+
+<View style={{flexDirection:"row", alignItems: 'center',  flex: 1,
+    justifyContent: "center",marginTop:5}}>
+
+<Button color={newcolor} icon="party-popper" mode="contained" onPress={() => {
+  
+  settype('New')
+  New123()
+  loadData()
+  setnewcolor("#332710")
+settopcolor("#F1F1F1")
+}}>
+
+    New 
+  </Button>  
+  
+  <Button color={topcolor} style={{buttonColor:"F1F1F1"}}icon="fire" mode="contained" onPress={() => {
+settype("Top")
+Top123()
+loadData()
+setnewcolor("#F1F1F1")
+settopcolor("#332710")
+}}>
+  Top 
+  </Button>
+
+</View>
+
+</View>
           
          <FlatList
-             
-            data = {data}
+            style={{marginTop:5}}
+            data = {data1}
             renderItem={({item})=>{
                 return renderdata(item)
             }}
             onRefresh={() => loadData()}
             refreshing = {loading}
             keyExtractor={item=>`${item.id}`}
+            onEndReached={()=>{loadmoredata()}}
+            onEndReachedThreshold={0}
+           
         />
 
         <FAB
@@ -410,7 +529,7 @@ const IconButton1 = ({ item }) => (
           
           <View style={styles1.modalView}> 
           <Pressable onPress={() => setModalVisible(!modalVisible)}>
-  <Text style={{margin:5,padding:5, color:"red",marginRight:100}}>X</Text>
+  <Text style={{margin:5,padding:5, color:"red",marginRight:140}}>X</Text>
 </Pressable> 
               <TextInput
               maxLength={500}
@@ -459,7 +578,7 @@ const IconButton1 = ({ item }) => (
   </View>}
           <View style={{flexDirection:"row"}}>
          
-            <FontAwesome5 name="poll-h" size={24} color="black" onPress={() => { setpolls1(true) }} style={{height:40,width:40}}/>
+            <FontAwesome5 name="poll-h" size={30} color="black" onPress={() => { setpolls1(true) }} style={{height:40,width:40}}/>
               <Pressable
               style={[styles1.button, styles1.buttonClose]}
               onPress={() => { insertData() }}
@@ -475,7 +594,7 @@ const IconButton1 = ({ item }) => (
            
 
       </Modal>
-        </ImageBackground>
+        </View>
         
        
     )
@@ -483,8 +602,14 @@ const IconButton1 = ({ item }) => (
 
 const styles = StyleSheet.create({
     cardStyle: {
-      margin: 10,
-      padding: 10,
+      
+      backgroundColor:"#F1F1F1",  
+      margin: 5,
+      marginRight:10,
+      marginLeft:10,
+      paddingLeft:10,
+      paddingTop:10,
+      paddingRight:10,
       borderRadius:10,
       borderWidth:1,
     },  
@@ -492,7 +617,8 @@ const styles = StyleSheet.create({
         position:"absolute",
         margin:16,
         right:0,
-        bottom:0,
+        bottom:10,
+        marginBottom:40
     }
   });
   const styles1 = StyleSheet.create({

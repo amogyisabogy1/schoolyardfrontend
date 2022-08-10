@@ -9,7 +9,8 @@ function Comment({username,text,replies,id, changeComment, postid}) {
   const [replies1,setReplies] = React.useState(replies)
   const [viewreplies, setViewReplies] = React.useState(true)
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [text1, onChangeText] = React.useState("");
+  const [replyusername,setreplyusername] = React.useState("");
+  const [text1, onChangeText] = React.useState(replyusername);
   console.log("look here")
   console.log(replies)
   console.log(replies)
@@ -19,7 +20,7 @@ function Comment({username,text,replies,id, changeComment, postid}) {
   console.log(replies)
   console.log(replies)
   console.log(replies)
-  const repliestocomments = replies1?.map?.((reply) =>
+  const [repliestocomments, setrepliestocomments] = React.useState(replies1?.map?.((reply) =>
   <Card style={{ marginLeft:25,
     margin:10,
     padding:10,
@@ -27,12 +28,16 @@ function Comment({username,text,replies,id, changeComment, postid}) {
     }} >
      <Text>{reply.username}</Text>   
      <Text>{reply.text}</Text> 
+     <Text onPress={()=>{setModalVisible(true)
+     setreplyusername(reply.username)
+    }}>Reply</Text>
+     
      </Card>
-);
+));
   const insertData = () =>{
-        
     setModalVisible(!modalVisible)
-    fetch(`http:/192.168.86.141/addreply/`,{
+        
+    fetch(`http:/192.168.29.189/addreply/`,{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",
@@ -43,14 +48,37 @@ function Comment({username,text,replies,id, changeComment, postid}) {
     
  }
  const loadData = () =>{
-    fetch(`http:/192.168.86.141/getcommentfromid/`,{
+    fetch(`http:/192.168.29.189/getcommentfromid/`,{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",
         },     
         body: JSON.stringify({postid:postid,id:id})
     }) 
-    .then(data=>setReplies(data.data))
+    .then(resp => resp.json())
+    .then(data =>{
+        console.log("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
+        console.log(data)
+        console.log("222222222222")
+        console.log(data.data)
+        var replies2 = data.data
+        var bruh = replies2?.map?.((reply) =>
+        <Card style={{ marginLeft:25,
+          margin:10,
+          padding:10,
+          flex: 1,
+          }} >
+           <Text>{reply.username}</Text>   
+           <Text>{reply.text}</Text> 
+           <Text onPress={()=>{setModalVisible(true)      
+           setreplyusername(reply.username)
+}}>Reply</Text>
+           
+           </Card>
+      );
+      setrepliestocomments(bruh)
+
+     })
  }
 
   return (

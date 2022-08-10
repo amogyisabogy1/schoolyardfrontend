@@ -8,7 +8,8 @@ import {   View,
   FlatList,
   TouchableWithoutFeedback, 
   
-  Keyboard,} from 'react-native';
+  Keyboard,
+  Alert,} from 'react-native';
 import { Button,Card} from "react-native-paper"
 import Ionicons from '@expo/vector-icons/Ionicons';
 import  {AuthContext}  from '../App'
@@ -17,7 +18,7 @@ import { MaterialHeaderButtons } from './MyHeaderbutton';
 import { Item } from 'react-navigation-header-buttons';
 import Comment from './comment';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import moment from 'moment';
 import { useActionSheet } from '@expo/react-native-action-sheet'; 
  
 const Postdetails = (props) => {
@@ -35,8 +36,11 @@ const Postdetails = (props) => {
     const [text, changeText] = React.useState(null);
     const [comment, changeComment] = React.useState([{text:"Comment"}]);
     const { showActionSheetWithOptions } = useActionSheet();
+
+    var posted = moment.utc(data.ctime).local().startOf('seconds').fromNow()
+
     const save = () =>{
-      fetch("http:/192.168.86.141/AddToSaved/",{
+      fetch("http:/192.168.29.189/AddToSaved/",{
         method:"POST",
         headers : {   
             "Content-Type":"application/json"
@@ -46,6 +50,27 @@ const Postdetails = (props) => {
     }
     const onPress1 = () =>{
      console.log("hi")
+     if(data.username==state.username){
+      showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Save','Delete', 'Edit'],
+          cancelButtonIndex: 0,
+          userInterfaceStyle: 'dark',
+        },
+        buttonIndex => {
+          if (buttonIndex === 0) {
+            // cancel action
+          } else if (buttonIndex === 1) {
+            save()
+          } else if(buttonIndex===2){
+            deletedData(data)
+          } else if(buttonIndex===3){
+            props.navigation.navigate("Edit",{data:data})
+          }
+          
+        }
+      );
+     }else{
      showActionSheetWithOptions(
       {
         options: ['Cancel', 'Save'],
@@ -59,7 +84,7 @@ const Postdetails = (props) => {
           save()
         } 
       }
-    );
+    );}
     }
     React.useLayoutEffect(() => {
       props.navigation.setOptions({
@@ -75,7 +100,7 @@ const Postdetails = (props) => {
     useEffect(()=>{
       console.log(data)
       console.log(data)
-      fetch(`http:/192.168.86.141/comment/${data.id}/`,{
+      fetch(`http:/192.168.29.189/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -87,7 +112,7 @@ const Postdetails = (props) => {
     },[])
   
     const deletedData = (data) => {
-      fetch(`http:/192.168.86.141/snippets/${data.id}/`,{
+      fetch(`http:/192.168.29.189/snippets/${data.id}/`,{
         method:"DELETE",
         headers: { 
           "Content-type":"application/json"
@@ -95,7 +120,8 @@ const Postdetails = (props) => {
       })
       .then(
         data =>{
-          
+
+          state.delete = true
           props.navigation.navigate("Home")
           
         }
@@ -103,7 +129,7 @@ const Postdetails = (props) => {
     
     }
     const loadData = () =>{
-      fetch(`http:/192.168.86.141/comment/${data.id}/`,{
+      fetch(`http:/192.168.29.189/comment/${data.id}/`,{
         method:"GET"
       })
       .then(resp => resp.json())
@@ -114,7 +140,10 @@ const Postdetails = (props) => {
 
    }
     const addComment = () =>{
-      fetch("http:/192.168.86.141/comment/",{
+      if(text==""){
+        Alert.alert("You Can't create a blank comment")
+      }
+      fetch("http:/192.168.29.189/comment/",{
           method:"POST",
           headers : {   
               "Content-Type":"application/json"
@@ -130,6 +159,9 @@ const Postdetails = (props) => {
       
    }
    const renderdata = (item) =>{
+    console.log("bruh")
+    console.log(data.id)
+    console.log(item.id)
     return (  
     <View style={{ flex: 1}}>
     <Comment postid = {data.id} id = {item.id} username={item.username} replies={item.data} text={item.text} changeComment={changeComment}/>
@@ -159,20 +191,12 @@ const Postdetails = (props) => {
         </View>
         <View>
         <Text onPress={()=>{save()}}>Save</Text>
+        <Text>{posted}</Text>
         </View>
        </Card>
-       <View>
-          {state.username == data.username ?
-          <View style={{flexDirection:'row'}}>
-          <Button icon = "delete"
-          mode = "contained" onPress={() => deletedData(data)} style = {{marginTop:30}}>Delete</Button>
-          <Button icon = "Edit"
-          mode = "contained" onPress={() => props.navigation.navigate("Edit",{data:data})} style = {{marginTop:30}}>Edit</Button>
-          </View>
-          : null}
-        </View>
-        <View style={{borderTopWidth: 1, borderBottomWidth:1}}>
-        <Text style={{fontSize:25,  
+       
+        <View style={{borderTopWidth: 1, borderBottomWidth:1, borderColor:'grey', backgroundColor:"#D5D5D5"}}>
+        <Text style={{fontSize:20,  
           borderColor: 'black'}}>
       {data.numberofcomments} Replies
     </Text>

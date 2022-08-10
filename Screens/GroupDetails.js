@@ -25,7 +25,7 @@ function GroupDetails({route, navigation}) {
     
     function loadData1(){
       console.log(state.school)
-      fetch(`http:/192.168.86.141/postsfromgroup`,{
+      fetch(`http:/192.168.29.189/postsfromgroup`,{
           method:"POST",
           headers:{  
               'Content-Type':"application/json",
@@ -45,7 +45,7 @@ function GroupDetails({route, navigation}) {
 
     const loadData = () => {
       console.log(state.school)
-      fetch(`http:/192.168.86.141/postsfromgroup`,{
+      fetch(`http:/192.168.29.189/postsfromgroup`,{
           method:"POST",
           headers:{  
               'Content-Type':"application/json",
@@ -63,7 +63,7 @@ function GroupDetails({route, navigation}) {
   }
     const insertData = () =>{
         setModalVisible(!modalVisible)
-        fetch("http:/192.168.86.141/addposttogroup/",{
+        fetch("http:/192.168.29.189/addposttogroup/",{
             method:"POST",
             headers : { 
                 "Content-Type":"application/json",
@@ -81,7 +81,7 @@ function GroupDetails({route, navigation}) {
         navigation.navigate("detail", {data:data, group:name})
     }
     useEffect(()=>{
-       fetch(`http:/192.168.86.141/postsfromgroup`,{
+       fetch(`http:/192.168.29.189/postsfromgroup`,{
             method:"POST",
             headers:{  
                 'Content-Type':"application/json",

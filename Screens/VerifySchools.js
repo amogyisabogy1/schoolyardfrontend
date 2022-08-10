@@ -1,23 +1,44 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity, Alert } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
+import  {AuthContext}  from '../App'
+import * as SecureStore from 'expo-secure-store';
 
 
-WebBrowser.maybeCompleteAuthSession();
+
+WebBrowser.maybeCompleteAuthSession(); 
 
 export default function App() {
   const [accessToken, setAccessToken] = React.useState();
   const [userInfo, setUserInfo] = React.useState();
   const [message, setMessage] = React.useState();
   const [school, setSchool] = React.useState();
+  const [{setToken}, state] = React.useContext(AuthContext);
   const localimage = require("../assets/Verify.png")
   const localimage1 = require("../assets/schoolyard.png")
 
   const navigation = useNavigation();
+  async function getValueFor(key) {
+    let result = await SecureStore.getItemAsync(key);
+    if (result) {
+      return result
+    } else {
+      return none
+    }
+  }
+  React.useEffect(()=>{
+  var refreshtoken = getValueFor("refreshtoken")
+  var accesstoken = getValueFor("accesstoken")
+  console.loe(refreshtoken)
+  console.log(accesstoken)
+  setToken({refreshtoken,accesstoken})})
+  
+  
+
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: "327267302325-c6entis7ms45pc3jul2l57rj9psovhft.apps.googleusercontent.com"
@@ -29,11 +50,15 @@ export default function App() {
       setAccessToken(response.authentication.accessToken);
     }
   }, [response]);
+
+  React.useEffect(()=>{
+
+  })
   
   async function Verify(email){
    async function VerifySchool1(emaillol){
         
-    return fetch("http:/192.168.86.141/verifyschool/",{
+    return fetch("http:/192.168.29.189/verifyschool/",{
       method:"POST",
       headers:{ 
         'Content-Type':"application/json"
@@ -44,9 +69,13 @@ export default function App() {
   }
   const schoolverified = await VerifySchool1(email);
   console.log(schoolverified)
-
+  if (schoolverified.length === 0){
+    console.log("does no exist ser")
+    Alert.alert("Seems like a school with that email does not exist")
+  }else{
   setSchool(schoolverified)
   navigateSchool(schoolverified, email)
+}
 } 
   
 function navigateSchool(schools, email1){

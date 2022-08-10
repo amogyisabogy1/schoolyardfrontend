@@ -97,7 +97,7 @@ function Register({route}) {
     padding: 10,
     borderColor:"black", 
     borderRadius:10}}
-      />
+      /> 
       <TextInput
         placeholder="Password"
         value={password}
@@ -143,13 +143,13 @@ async function save(key, value) {
 
 
 
-export default function App({ navigation }) {
+export default function App({ navigation }) { 
   
   const [loading,setLoading] = React.useState(true);
    
   
   async function Verify(){    
-    const res = await fetch("http:/192.168.86.141/getinfofromtoken/",{
+    const res = await fetch("http:/192.168.29.189/getinfofromtoken/",{
       method:"GET",
       headers:{  
         'Authorization': state.accesstoken,
@@ -169,7 +169,6 @@ export default function App({ navigation }) {
             ...prevState,
             accesstoken: action.accesstoken,
             refreshtoken: action.refreshtoken,
-            isLoading: false,
           }; 
         case 'SIGN_IN':
           return {
@@ -200,34 +199,24 @@ export default function App({ navigation }) {
       accesstoken: null,
       username: null,
       school: null,
+      delete:false,
     }
   );
    React.useEffect(() => {
 
-    // Fetch the token from storage then navigate to our appropriate place
-    const bootstrapAsync = async () => {
-      let userToken;
-       // replenish
-       
-      try {
-        userToken = await SecureStore.getItemAsync('accesstoken');
-        // Restore token stored in `SecureStore` or any other encrypted storage
-        // userToken = await SecureStore.getItemAsync('userToken');
-      } catch (e) {
+        var userToken =  SecureStore.getItemAsync('accesstoken');
+        console.log("hi")
+        console.log(userToken)
+        console.log("hi")
+        console.log(userToken)
+        console.log(userToken)
+        console.log(userToken)
         // Restoring token failed
         console.log("error")
-      }
-      // After restoring token, we may need to validate it in production apps
-     
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
-      if (userToken != null){
-        dispatch({ type: 'RESTORE_TOKEN', token: userToken });
-      }
-      
-    };
+        dispatch({ type: 'RESTORE_TOKEN', accesstoken: userToken });
 
-    bootstrapAsync();
+       
+    
   }, []);
 
   
@@ -250,7 +239,7 @@ export default function App({ navigation }) {
         console.log(data.username)
         async function Signuplol(){
          
-          return fetch("http:/192.168.86.141/token/",{
+          return fetch("http:/192.168.29.189/token/",{
             method:"POST", 
             headers:{ 
               'Content-Type':"application/json"
@@ -267,7 +256,7 @@ export default function App({ navigation }) {
         
         
         
-
+ 
       },
       signOut: () => {
         dispatch({ type: 'SIGN_OUT' }) 
@@ -276,7 +265,7 @@ export default function App({ navigation }) {
       signUp: async (data) => {
        async function Signuplol(){
         
-        return fetch("http:/192.168.86.141/register/",{
+        return fetch("http:/192.168.29.189/register/",{
           method:"POST",
           headers:{ 
             'Content-Type':"application/json"
@@ -293,6 +282,8 @@ export default function App({ navigation }) {
       console.log(state.refreshtoken)
       updateToken()
       console.log(state.refreshtoken)
+      },setToken: async (data)=>{
+        dispatch({ type: 'RESTORE_TOKEN', refreshtoken: data.refreshtoken, accesstoken:data.accesstoken });
       },
     }),
     []
@@ -312,22 +303,16 @@ export default function App({ navigation }) {
       }
     }, 240000)
     return ()=> clearInterval(interval)
+    
+    setLoading(false)
+
   },[state.refreshtoken,loading])
 
 
   let updateToken = async ()=> {
-    console.log("hi")
-    console.log(state)
-    console.log(state)
-    console.log(state.accesstoken)
-    console.log(state.refreshtoken)
-    console.log(state.refreshtoken)
-    console.log(state.refreshtoken)
-    console.log(state.refreshtoken)
-    console.log(state.refreshtoken)
-    console.log("hi")
-    
-    let response = await fetch('http://192.168.86.141/token/refresh/', {
+
+  if (state.accesstoken){    
+    let response = await fetch('http://192.168.29.189/token/refresh/', {
         method:'POST', 
         headers:{
             'Content-Type':'application/json'
@@ -344,6 +329,7 @@ export default function App({ navigation }) {
     }
     if(loading == true){
       setLoading(false)
+  }
   }
 }
 
@@ -386,7 +372,7 @@ function Home1() {
           }
         })
         }/>
-      <Tab.Screen name="Groups" component={Group}   options={(route)=>({...headerstyles,title:"groups ", tabBarIcon: ({ focused, color, size }) => {
+      <Tab.Screen name="Groups" component={Group}   options={(route)=>({...headerstyles,title:"groups ", color:"white",tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
             if (route.name === 'Groups') {
@@ -403,7 +389,7 @@ function Home1() {
           tabBarActiveTintColor: 'blue',
           tabBarInactiveTintColor: 'gray',
         })}  />
-       <Tab.Screen name="Vent" component={Vent}  options= {(route)=>({...headerstyles,title:"Vent ",tabBarIcon: ({ focused, color, size }) => {
+       <Tab.Screen name="Vent" component={Vent}  options= {(route)=>({...headerstyles,title:"Vent ", color:"white",tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
             if (route.name === 'Home') {

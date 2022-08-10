@@ -17,7 +17,7 @@ function Edit(props) {
  
  const insertData = () =>{
         
-    fetch(`http:/192.168.86.141/Edit/`,{
+    fetch(`http:/192.168.29.189/Edit/`,{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",

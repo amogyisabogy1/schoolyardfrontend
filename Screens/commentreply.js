@@ -11,7 +11,7 @@ function Comment({username,text,replies,id}) {
   const insertData = () =>{
         
     setModalVisible(!modalVisible)
-    fetch(`http:/192.168.86.141/addreply/`,{
+    fetch(`http:/192.168.29.189/addreply/`,{
         method:"POST",
         headers : { 
             "Content-Type":"application/json",
