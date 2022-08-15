@@ -548,7 +548,7 @@ function MyStack() {
       borderWidth: 1,
       padding: 10,
       borderColor:"black",  
-      borderRadius:10}} 
+      borderRadius:10}} /
       />
 
 
