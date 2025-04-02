@@ -1,4 +1,3 @@
-
 import React, {useState, useContext} from 'react';
 import {View, Text, TouchableOpacity, Alert,} from 'react-native';
 import { Button } from 'react-native-paper';
