@@ -12,7 +12,6 @@ function Newgrouppost({navigation, route}) {
  console.log(state.username)
  const [title,setTitle] = useState()
  
-
     
  const insertData = () =>{
     fetch("http:/192.168.29.189/addposttogroup/",{
