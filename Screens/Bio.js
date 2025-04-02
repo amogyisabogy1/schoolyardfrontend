@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import Comment from './comment';
 
 
-
 function Bio(props) {
   const biop = props.route.params.bioprop
   const [bioprop, setprop] = React.useState(biop)
